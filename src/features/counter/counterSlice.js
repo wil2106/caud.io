@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 export const counterSlice = createSlice({
   name: 'counter',
@@ -32,6 +33,9 @@ export const incrementAsync = amount => dispatch => {
   setTimeout(() => {
     dispatch(incrementByAmount(amount));
   }, 1000);
+  axios.get(`/api/test`)
+      .then(res => console.log(res))
+      .catch(err => console.log(err))
 };
 
 // The function below is called a selector and allows us to select a value from
