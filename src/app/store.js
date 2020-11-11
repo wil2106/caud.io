@@ -1,8 +1,14 @@
-import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import { configureStore } from '@reduxjs/toolkit'
+import userReducer from './userSlice'
+import musicPackReducer from './musicPackSlice'
+import liveSessionReducer from './liveSessionSlice'
+import playableMusicReducer from './playableMusicSlice'
 
 export default configureStore({
   reducer: {
-    counter: counterReducer,
+    User: userReducer,
+    MusicPack: musicPackReducer,
+    LiveSession: liveSessionReducer,
+    playableMusicReducer: playableMusicReducer,
   },
-});
+})
