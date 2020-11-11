@@ -1,4 +1,20 @@
 
+# Running the project
+## Install dependencies
+```
+npm install
+```
+
+## Build the webapp
+```
+npm run build
+```
+
+## Run the project
+```
+npm start
+```
+
 # Synopsis
 
 ## Project overview
