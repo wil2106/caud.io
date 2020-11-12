@@ -1,7 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const defaultMusicPack = {
-  musics: [],
+  musics: [
+    {
+      id: 1,
+      title: 'Example title',
+      image: 'https://upload.wikimedia.org/wikipedia/en/6/60/Aimer_Dawn.jpg',
+      username: 'User',
+      nb_forks: 10,
+      nb_likes: 10,
+      nb_listen: 10,
+    },
+  ],
   mostRecentIDs: [],
   mostLikedIDs: [],
   mostListenedIDs: [],
