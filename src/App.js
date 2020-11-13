@@ -5,15 +5,7 @@ import Home from './pages/home'
 
 function App() {
   return (
-    <div
-      className="App"
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        width: '100',
-        justifyContent: 'space-around',
-      }}
-    >
+    <div className="App">
       <Router>
         <Switch>
           <Route exact path="/home">

@@ -12,7 +12,7 @@ const defaultMusicPack = {
       nb_listen: 10,
     },
   ],
-  mostRecentIDs: [],
+  mostRecentIDs: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   mostLikedIDs: [],
   mostListenedIDs: [],
   mostForkedIDs: [],

@@ -20,9 +20,11 @@ export default function MusicCard(props) {
     width: 250,
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: hover ? '#444857' : '#1F2229',
     position: 'relative',
-    borderRadius: 4,
+    height: 284,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: !hover && 20,
   }
 
   const imageStyle = {
@@ -91,6 +93,13 @@ export default function MusicCard(props) {
     marginBottom: 20,
     width: '100%',
   }
+
+  const containerWrapper = {
+    width: '100%',
+    height: 'fit-content',
+    backgroundColor: hover ? '#444857' : '#1F2229',
+    borderRadius: 6,
+  }
   /**
    * Event handlers
    */
@@ -105,32 +114,34 @@ export default function MusicCard(props) {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div style={{ width: '100%', position: 'relative' }}>
-        <img src={musicObject.image} style={imageStyle} />
-        {hover && (
-          <ButtonBase style={playButtonStyle} onClick={onPlayButtonClick}>
-            <PlayArrowIcon style={{ color: '#fff' }} />
-          </ButtonBase>
-        )}
-      </div>
-      <h1 style={titleStyle}>{musicObject.title}</h1>
-      <p style={authorStyle}>{`By ${musicObject.username}`}</p>
-      {hover ? (
-        <div style={buttonsContainer}>
-          <Button style={optionStyle}>
-            <FavoriteIcon style={{ fontSize: 14 }} />
-            {musicObject['nb_likes']}
-          </Button>
-          <Button style={optionStyle}>
-            <ForkIcon width="12px" height="12px" />
-            {musicObject['nb_forks']}
-          </Button>
-          <p style={playStyle}>
-            <PlayArrowIcon style={{ fontSize: 12 }} />
-            {musicObject['nb_listen']}
-          </p>
+      <div style={containerWrapper}>
+        <div style={{ width: '100%', position: 'relative' }}>
+          <img src={musicObject.image} style={imageStyle} />
+          {hover && (
+            <ButtonBase style={playButtonStyle} onClick={onPlayButtonClick}>
+              <PlayArrowIcon style={{ color: '#fff' }} />
+            </ButtonBase>
+          )}
         </div>
-      ) : null}
+        <h1 style={titleStyle}>{musicObject.title}</h1>
+        <p style={authorStyle}>{`By ${musicObject.username}`}</p>
+        {hover ? (
+          <div style={buttonsContainer}>
+            <Button style={optionStyle}>
+              <FavoriteIcon style={{ fontSize: 14 }} />
+              {musicObject['nb_likes']}
+            </Button>
+            <Button style={optionStyle}>
+              <ForkIcon width="12px" height="12px" />
+              {musicObject['nb_forks']}
+            </Button>
+            <p style={playStyle}>
+              <PlayArrowIcon style={{ fontSize: 12 }} />
+              {musicObject['nb_listen']}
+            </p>
+          </div>
+        ) : null}
+      </div>
     </div>
   )
 }

@@ -12,13 +12,13 @@ export default function MusicContainer(props) {
     flexWrap: 'wrap',
     width: '100%',
     height: '100%',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-start',
   }
 
   return (
     <div style={container}>
-      {list.map((element) => (
-        <MusicCard musicID={element} />
+      {list.map((element, key) => (
+        <MusicCard musicID={element} key={key} />
       ))}
     </div>
   )

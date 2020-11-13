@@ -14,7 +14,7 @@ export default function NavBar(props) {
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
-    width: 180,
+    width: 200,
     alignItems: 'center',
     backgroundColor: '#1E1F26',
   }
@@ -26,7 +26,7 @@ export default function NavBar(props) {
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 20,
-    width: 150,
+    width: 135,
   }
 
   const logoStyle = {
