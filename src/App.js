@@ -1,6 +1,7 @@
 import React from 'react'
 import './App.css'
-import NavBar from './components/navBar'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import Home from './pages/home'
 
 function App() {
   return (
@@ -13,7 +14,13 @@ function App() {
         justifyContent: 'space-around',
       }}
     >
-      <NavBar />
+      <Router>
+        <Switch>
+          <Route exact path="/home">
+            <Home />
+          </Route>
+        </Switch>
+      </Router>
     </div>
   )
 }
