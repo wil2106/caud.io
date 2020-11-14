@@ -1,15 +1,13 @@
 import React from 'react'
 import Logo from './../assets/svg/logo'
 import NavItem from './navItem'
-import { useSelector } from 'react-redux'
-import { selectAllPages } from '../app/uiController'
 import { Button } from '@material-ui/core'
+import { pages } from './../app/UIConstants'
 
 const LOGO_SIZE = 60
 const CREATE_NEW = 'NEW'
 
 export default function NavBar(props) {
-  const pages = useSelector(selectAllPages)
   const container = {
     display: 'flex',
     flexDirection: 'column',

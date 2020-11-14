@@ -13,6 +13,8 @@ export default function MusicContainer(props) {
     width: '100%',
     height: '100%',
     justifyContent: 'flex-start',
+    overflow: 'scroll',
+    overflowX: 'hidden',
   }
 
   return (

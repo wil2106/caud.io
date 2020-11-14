@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { containers } from './UIConstants'
 
 const defaultMusicPack = {
   musics: [
@@ -13,9 +14,10 @@ const defaultMusicPack = {
     },
   ],
   mostRecentIDs: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  mostLikedIDs: [],
-  mostListenedIDs: [],
-  mostForkedIDs: [],
+  mostLikedIDs: [1, 1, 1, 1, 1, 1, 1, 1],
+  mostListenedIDs: [1, 1, 1],
+  mostForkedIDs: [1, 1],
+  searchResult: [],
 }
 
 // Create MusicPack redux slice
@@ -30,6 +32,12 @@ export const {} = musicPackSlice.actions
 
 // Export selectors
 export const selectMusics = (state) => state.MusicPack.musics
+export const selectCurrentList = (state) => {
+  let current = state.UIController.currentContainer
+  let target = containers.find((element) => element.name === current)
+  return state.MusicPack[target.list]
+}
+export const selectSearchList = (state) => state.MusicPack.searchResult
 
 // Export default reducers
 export default musicPackSlice.reducer
