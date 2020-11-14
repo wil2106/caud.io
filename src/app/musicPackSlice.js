@@ -1,6 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { containers } from './UIConstants'
 
+/**
+ * Default state of Music Pack
+ * Note: the values are purely for debugging purpose, everything should be either empty array either null
+ * Should remove value before production commits
+ */
 const defaultMusicPack = {
   musics: [
     {

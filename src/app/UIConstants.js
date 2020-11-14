@@ -1,5 +1,8 @@
 import { Person, Explore } from '@material-ui/icons'
 
+/**
+ * List of javascript navigation driven pages
+ */
 export const pages = [
   {
     icon: Explore,
@@ -11,6 +14,9 @@ export const pages = [
   },
 ]
 
+/**
+ * List of javascript navigation driven containers in Home
+ */
 export const containers = [
   {
     name: 'Most recent',

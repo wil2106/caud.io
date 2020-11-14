@@ -1,11 +1,17 @@
 import React, { useState } from 'react'
 import CancelIcon from '@material-ui/icons/Cancel'
 
+/**
+ * Constants
+ */
 const BACKGROUND_ACTIVE = '#393c45'
 const BACKGROUND_INACTIVE = '#252830'
 const BACKGROUND_HOVERED = '#393c45'
 
 export default function SearchBar(props) {
+  /**
+   * State
+   */
   const [input, setInput] = useState('')
   const [background, setBackground] = useState('')
   const ref = React.createRef()
@@ -24,6 +30,9 @@ export default function SearchBar(props) {
     ref.current.blur()
   }
 
+  /**
+   * Style
+   */
   const container = {
     display: 'flex',
     marginLeft: 25,

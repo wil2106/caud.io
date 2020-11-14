@@ -5,12 +5,16 @@ import liveSessionReducer from './liveSessionSlice'
 import playableMusicReducer from './playableMusicSlice'
 import uiControllerReducer from './uiController'
 
+/**
+ * Initialize redux store
+ * Rule: Store names starts with an Uppercase letter
+ */
 export default configureStore({
   reducer: {
     User: userReducer,
     MusicPack: musicPackReducer,
     LiveSession: liveSessionReducer,
-    playableMusicReducer: playableMusicReducer,
+    PlayableMusicReducer: playableMusicReducer,
     UIController: uiControllerReducer,
   },
 })

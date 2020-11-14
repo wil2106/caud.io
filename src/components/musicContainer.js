@@ -5,6 +5,9 @@ export default function MusicContainer(props) {
   // List passed should be a list of musicIDs (see redux store)
   const { list } = props
 
+  /**
+   * Style
+   */
   const container = {
     display: 'flex',
     flexGrow: 1,

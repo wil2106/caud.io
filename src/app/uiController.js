@@ -1,11 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { containers, pages } from './UIConstants'
 
+/**
+ * Default state of UIController
+ */
 const defaultState = {
   current: 'Explore',
   currentContainer: 'Most recent',
 }
 
+// Create UI redux slice
 export const UISlicer = createSlice({
   name: 'UIController',
   initialState: defaultState,
@@ -21,13 +25,13 @@ export const UISlicer = createSlice({
   },
 })
 
+// Export Actions
 export const { navigate, containerNavigate } = UISlicer.actions
 
-/**
- * React redux selectors
- */
+// Export selectors
 export const selectCurrent = (state) => state.UIController.current
 export const selectCurrentContainer = (state) =>
   state.UIController.currentContainer
 
+// Export default reducers
 export default UISlicer.reducer

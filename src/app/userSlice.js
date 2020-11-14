@@ -1,5 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+/**
+ * Default state of User
+ * Note: the values are purely for debugging purpose, everything should be either empty array either null
+ * Should remove value before production commits
+ */
 const defaultUser = {
   login: '',
   description: '',
@@ -7,6 +12,7 @@ const defaultUser = {
   userMusicsIDs: [],
 }
 
+// Create User redux slice
 export const userSlice = createSlice({
   name: 'User',
   initialState: defaultUser,

@@ -7,13 +7,23 @@ import { selectCurrentList, selectSearchList } from '../app/musicPackSlice'
 import SearchBar from './../components/searchBar'
 import { Button } from '@material-ui/core'
 
+/**
+ * Constants
+ */
 const LOGIN = 'Login'
 const SIGNUP = 'Sign up'
 
 export default function Home(props) {
+  /**
+   * State
+   */
   const searchResult = useSelector(selectSearchList)
   const musicList = useSelector(selectCurrentList)
+  const displayList = searchResult?.length === 0 ? musicList : searchResult
 
+  /**
+   * Style
+   */
   const container = {
     display: 'flex',
     flexDirection: 'row',
@@ -58,8 +68,6 @@ export default function Home(props) {
     marginRight: 10,
     width: 100,
   }
-
-  const displayList = searchResult?.length === 0 ? musicList : searchResult
 
   return (
     <div style={container}>

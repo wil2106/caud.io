@@ -4,10 +4,16 @@ import NavItem from './navItem'
 import { Button } from '@material-ui/core'
 import { pages } from './../app/UIConstants'
 
+/**
+ * Constants
+ */
 const LOGO_SIZE = 60
 const CREATE_NEW = 'NEW'
 
 export default function NavBar(props) {
+  /**
+   * Style
+   */
   const container = {
     display: 'flex',
     flexDirection: 'column',

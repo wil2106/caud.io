@@ -3,6 +3,9 @@ import { containers } from './../app/UIConstants'
 import ContainerLabel from './containerLabel'
 
 export default function ContainerSwitcher(props) {
+  /**
+   * Style
+   */
   const container = {
     width: '100%',
     display: 'flex',
@@ -19,6 +22,7 @@ export default function ContainerSwitcher(props) {
     bottom: 0,
     zIndex: -1,
   }
+
   return (
     <div style={container}>
       {containers.map((element, key) => (

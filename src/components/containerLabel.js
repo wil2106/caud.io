@@ -5,18 +5,27 @@ import {
   selectCurrentContainer,
 } from './../app/uiController'
 
+/**
+ * Style constants
+ */
 const COLOR_ACTIVE = '#fff'
 const COLOR_INACTIVE = '#717790'
 const BACKGROUND_HOVER = '#272a33'
 
 export default function ContainerLabel(props) {
-  const [hover, setHover] = useState(false)
   const { title } = props
+
+  /**
+   * State
+   */
+  const [hover, setHover] = useState(false)
   const currentContainer = useSelector(selectCurrentContainer)
   const dispatch = useDispatch()
-
   const selected = title === currentContainer
 
+  /**
+   * Styles
+   */
   const container = {
     position: 'relative',
     paddingLeft: 5,
@@ -44,12 +53,13 @@ export default function ContainerLabel(props) {
     fontWeight: 'bold',
   }
 
+  /**
+   * Event handlers
+   */
   const onClick = !selected
     ? () => dispatch(containerNavigate({ name: title }))
     : null
-
   const onMouseEnter = !selected ? () => setHover(true) : null
-
   const onMouseLeave = !selected ? () => setHover(false) : null
 
   return (

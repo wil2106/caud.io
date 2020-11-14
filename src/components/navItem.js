@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrent, navigate } from './../app/uiController'
 
+/**
+ * Constants
+ */
 const ICON_SIZE = '16px'
 const COLOR_ACTIVE = '#fff'
 const COLOR_INACTIVE = '#717790'
@@ -9,6 +12,9 @@ const BACKGROUND_HOVERED = '#393c45'
 
 export default function NavItem(props) {
   const { icon: Icon, title } = props.page
+  /**
+   * State
+   */
   const [hover, setHover] = useState(false)
   const dispatch = useDispatch()
   /**
@@ -16,7 +22,11 @@ export default function NavItem(props) {
    */
   const current = useSelector(selectCurrent)
   const selected = current === title
+  const iconFill = selected ? COLOR_ACTIVE : COLOR_INACTIVE
 
+  /**
+   * Style
+   */
   const container = {
     display: 'flex',
     flexDirection: 'row',
@@ -46,10 +56,10 @@ export default function NavItem(props) {
     position: 'absolute',
   }
 
-  const iconFill = selected ? COLOR_ACTIVE : COLOR_INACTIVE
-
+  /**
+   * Event handlers
+   */
   const onClick = !selected ? () => dispatch(navigate({ page: title })) : null
-
   const onMouseEnter = !selected ? () => setHover(true) : null
   const onMouseLeave = !selected ? () => setHover(false) : null
 

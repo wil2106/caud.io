@@ -7,15 +7,17 @@ import ForkIcon from './../assets/svg/fork'
 
 export default function MusicCard(props) {
   const { musicID } = props
+  /**
+   * State
+   */
   const [hover, setHover] = useState(false)
   const musicObject = useSelector((state) =>
     state.MusicPack.musics.find((element) => element.id === musicID)
   )
 
   /**
-   * Style objects
+   * Style
    */
-
   const container = {
     width: 250,
     display: 'flex',
@@ -103,7 +105,6 @@ export default function MusicCard(props) {
   /**
    * Event handlers
    */
-
   const onMouseEnter = () => setHover(true)
   const onMouseLeave = () => setHover(false)
   const onPlayButtonClick = () => {}

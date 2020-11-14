@@ -1,5 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+/**
+ * Default state of LiveSession state
+ * Note: the values are purely for debugging purpose, everything should be either empty array either null
+ * Should remove value before production commits
+ */
 const defaultLiveSession = {
   id: '',
   users: [],
@@ -7,6 +12,7 @@ const defaultLiveSession = {
   stepCode: '',
 }
 
+// Create LiveSession redux slice
 export const liveSessionSlice = createSlice({
   name: 'LiveSession',
   initialState: defaultLiveSession,
