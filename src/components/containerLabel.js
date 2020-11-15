@@ -57,7 +57,10 @@ export default function ContainerLabel(props) {
    * Event handlers
    */
   const onClick = !selected
-    ? () => dispatch(containerNavigate({ name: title }))
+    ? () => {
+        dispatch(containerNavigate({ name: title }))
+        setHover(false)
+      }
     : null
   const onMouseEnter = !selected ? () => setHover(true) : null
   const onMouseLeave = !selected ? () => setHover(false) : null
