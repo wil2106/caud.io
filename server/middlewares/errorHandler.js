@@ -1,5 +1,6 @@
-const { Error: SequelizeError, ValidationError } = require('sequelize')
+const { Error: SequelizeError } = require('sequelize')
 const { AssertionError } = require('assert')
+const UserError = require()
 
 exports.wrapAsync = (fn) => {
   return function (req, res, next) {
@@ -19,7 +20,7 @@ exports.databaseErrorHandler = (error, req, res, next) => {
   next(error)
 }
 
-exports.assertionErrorHandler = (error, res, res, next) => {
+exports.assertionErrorHandler = (error, req, res, next) => {
   if (error instanceof AssertionError) {
     return res.status(400).json({
       type: 'AssertionError',
@@ -27,4 +28,10 @@ exports.assertionErrorHandler = (error, res, res, next) => {
     })
   }
   next(error)
+}
+
+exports.userErrorHandler = (error, req, res, next) => {
+  if (error instanceof UserError) {
+    return res.status()
+  }
 }
