@@ -10,7 +10,7 @@ function createMusic(req, res) {
     step_code: req.body.step_code,
     can_fork: req.body.can_fork,
     private: req.body.private,
-    image: null
+    image: req.body.image
   }
   musicService.add(music).then(data => res.send(data));
 };
