@@ -8,4 +8,3 @@ const router = Router()
 router.post('/music/listen',authMiddleware.checkAuth , musicController.listen)
 
 module.exports = router
-
