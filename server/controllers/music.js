@@ -13,8 +13,12 @@ function createMusic(req, res) {
     step_code: req.body.step_code,
     can_fork: req.body.can_fork,
     private: req.body.private,
+<<<<<<< HEAD
     image: req.body.image,
     fk_author: req.body.fk_author
+=======
+    image: req.body.image
+>>>>>>> 400f73cddf25e1780a9d1240c36d507a95b9cd93
   }
 
   musicService.add(music)
