@@ -4,7 +4,6 @@ const musicController = require('../controllers/music')
 
 
 const router = Router()
+router.post('/music/like',authMiddleware.checkAuth , musicController.like)
 router.post('/music',authMiddleware.checkAuth, musicController.createMusic)
-
 module.exports = router
-
