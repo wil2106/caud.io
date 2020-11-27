@@ -2,7 +2,6 @@ const musicService = require('../services/music');
 const libraryService = require('../services/library');
 const sampleService = require('../services/sample');
 
-
 function createMusic(req, res) {
   let music = {
     title: req.body.title,
@@ -13,12 +12,8 @@ function createMusic(req, res) {
     step_code: req.body.step_code,
     can_fork: req.body.can_fork,
     private: req.body.private,
-<<<<<<< HEAD
     image: req.body.image,
     fk_author: req.body.fk_author
-=======
-    image: req.body.image
->>>>>>> 400f73cddf25e1780a9d1240c36d507a95b9cd93
   }
 
   musicService.add(music)
@@ -37,6 +32,54 @@ function createMusic(req, res) {
   });
 }
 
+function like(req, res) {
+  let notification = {
+    action: req.body.action,
+    fk_user: req.body.fk_user,
+    fk_emitter: req.body.fk_emmiter,
+    fk_music: req.body.id
+
+  }
+  musicService.like(req.body.id).then(data => {
+    if(data==0) {
+      return res.status(404).send({error: 'No music with this id'});
+    }
+    res.status(204).send();
+  });
+  musicService.notify(notification).then(data => res.send(data));
+}
+
+function listen(req, res) {
+  musicService.listen(req.body.id).then(data => {
+    if (data==0) {
+     return res.status(404).send({error: 'No music with this id'});
+    }
+    res.status(204).send();
+   });
+}
+
+function mostLike(req, res) {
+  musicService.mostLike().then(data => res.send(data));
+}
+
+function mostRecent(req, res) {
+  musicService.mostRecent().then(data => res.send(data));
+}
+
+function mostFork(req, res) {
+  musicService.mostFork().then(data => res.send(data));
+}
+
+function mostListen(req, res) {
+  musicService.mostListen().then(data => res.send(data));
+}
+
 module.exports = {
-    createMusic
+    createMusic,
+    like,
+    listen,
+    mostLike,
+    mostRecent,
+    mostFork,
+    mostListen
 }
