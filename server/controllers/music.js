@@ -30,6 +30,15 @@ function like(req, res) {
   });
   musicService.notify(notification).then(data => res.send(data));
 }
+
+function listen(req, res) {
+  musicService.listen(req.body.id).then(data => {
+    if (data==0) {
+     return res.status(404).send({error: 'No music with this id'});
+    }
+    res.status(204).send();
+   });
+}
 module.exports = {
-    createMusic, like
+    createMusic, like, listen
 }

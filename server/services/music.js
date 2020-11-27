@@ -1,4 +1,3 @@
-
 const { Music, Notification } = require('../models');
 const sequelize = require('../db');
 
@@ -11,4 +10,8 @@ const like = (id_) => Music.update({
 
 const notify = notification => Notification.create(notification);
 
-module.exports = {like, notify, add};
+const listen = id_ => Music.update({ nb_listen: sequelize.literal('nb_listen + 1')}, {
+    where: {id: id_}
+});
+
+module.exports = {like, notify, add, listen};
