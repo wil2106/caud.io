@@ -39,6 +39,29 @@ function listen(req, res) {
     res.status(204).send();
    });
 }
+
+function mostLike(req, res) {
+  musicService.mostLike().then(data => res.send(data));
+}
+
+function mostRecent(req, res) {
+  musicService.mostRecent().then(data => res.send(data));
+}
+
+function mostFork(req, res) {
+  musicService.mostFork().then(data => res.send(data));
+}
+
+function mostListen(req, res) {
+  musicService.mostListen().then(data => res.send(data));
+}
+
 module.exports = {
-    createMusic, like, listen
+    createMusic,
+    like,
+    listen,
+    mostLike,
+    mostRecent,
+    mostFork,
+    mostListen
 }
