@@ -1,7 +1,7 @@
 const Router =  require('express').Router
 const authRouter = require('./auth.js') 
 const sampleRouter = require('./sample.js') 
-const musicRouter = require('./music.js')
+const musicRouter = require('./music.js') 
 
 const router = Router()
 router.use('/', authRouter)
