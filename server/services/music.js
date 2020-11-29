@@ -46,4 +46,8 @@ const mostListen = () => Music.findAll({
     limit: 10
 })
 
-module.exports = {like, notify, add, listen, mostLike, mostRecent, mostFork, mostListen};
+const fullMusic = id_ => Music.findAll({
+    where: {id: id_}
+});
+
+module.exports = {like, notify, add, listen, mostLike, mostRecent, mostFork, mostListen, fullMusic};
