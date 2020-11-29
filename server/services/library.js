@@ -2,4 +2,9 @@ const Libraries = require('../models').Library;
 
 const getAll = () => Libraries.findAll();
 const add = (library) => Libraries.create(library);
-module.exports = {add, getAll};
+const getSamplesForMusic = musicId_ => Libraries.findAll({
+    attributes: ["sampleId"],
+    where: {musicId: musicId_}
+});
+
+module.exports = {add, getAll, getSamplesForMusic};

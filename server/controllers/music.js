@@ -74,6 +74,26 @@ function mostListen(req, res) {
   musicService.mostListen().then(data => res.send(data));
 }
 
+function getFullMusic(req, res) {
+  let fullMusic = {
+    music: null,
+    samples: []
+  }
+  Promise.all([musicService.fullMusic(req.params.id), libraryService.getSamplesForMusic(req.params.id)])
+  .then(data => {
+    fullMusic.music = data[0];
+    Promise.all(data[1].map(x => x.dataValues.sampleId).map(s => {
+      return sampleService.getById(s);
+    }))
+    .then(samplesData => {
+      samplesData.forEach(sampleData => {
+        fullMusic.samples.push(sampleData);
+      })
+      res.send(fullMusic);
+    });
+  });
+}
+
 module.exports = {
     createMusic,
     like,
@@ -81,5 +101,6 @@ module.exports = {
     mostLike,
     mostRecent,
     mostFork,
-    mostListen
+    mostListen,
+    getFullMusic
 }
