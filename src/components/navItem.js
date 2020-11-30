@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrent, navigate } from './../app/uiController'
 
@@ -62,6 +62,13 @@ export default function NavItem(props) {
   const onClick = !selected ? () => dispatch(navigate({ page: title })) : null
   const onMouseEnter = !selected ? () => setHover(true) : null
   const onMouseLeave = !selected ? () => setHover(false) : null
+
+  /**
+   * Use Effects
+   */
+  useEffect(() => {
+    !selected && setHover(false)
+  }, [selected])
 
   return (
     <div
