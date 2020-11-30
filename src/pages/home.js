@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
+import React from 'react'
 import NavBar from '../components/navBar'
 import MusicContainer from './../components/musicContainer'
 import { useSelector } from 'react-redux'
 import ContainerSwitcher from './../components/containerSwitcher'
-import { selectCurrentList, selectSearchList } from '../app/musicPackSlice'
+import {
+  selectCurrentList,
+  selectLoading,
+  selectSearchList,
+} from '../app/musicPackSlice'
 import SearchBar from './../components/searchBar'
 import { Button } from '@material-ui/core'
 
@@ -19,6 +23,7 @@ export default function Home(props) {
    */
   const searchResult = useSelector(selectSearchList)
   const musicList = useSelector(selectCurrentList)
+  const loading = useSelector(selectLoading)
   const displayList = searchResult?.length === 0 ? musicList : searchResult
 
   /**
@@ -36,6 +41,7 @@ export default function Home(props) {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+    position: 'relative',
   }
 
   const topBar = {
@@ -69,6 +75,21 @@ export default function Home(props) {
     width: 100,
   }
 
+  const loadingStyle = {
+    color: '#fff',
+    position: 'absolute',
+    bottom: 100,
+    alignSelf: 'center',
+    backgroundColor: '#fff6',
+    height: 50,
+    width: 150,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 15,
+  }
+
   return (
     <div style={container}>
       <NavBar />
@@ -80,6 +101,11 @@ export default function Home(props) {
         </div>
         {searchResult?.length === 0 && <ContainerSwitcher />}
         <MusicContainer list={displayList} />
+        {loading && (
+          <div style={loadingStyle}>
+            <p>Loading</p>
+          </div>
+        )}
       </div>
     </div>
   )
