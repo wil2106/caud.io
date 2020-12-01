@@ -10,6 +10,8 @@ import {
 } from '../app/musicPackSlice'
 import SearchBar from './../components/searchBar'
 import { Button } from '@material-ui/core'
+import useAuth from '../components/hooks/useAuth'
+import ProfileIndicator from '../components/profileIndicator'
 
 /**
  * Constants
@@ -25,6 +27,7 @@ export default function Home(props) {
   const musicList = useSelector(selectCurrentList)
   const loading = useSelector(selectLoading)
   const displayList = searchResult?.length === 0 ? musicList : searchResult
+  const user = useAuth()
 
   /**
    * Style
@@ -96,8 +99,14 @@ export default function Home(props) {
       <div style={panel}>
         <div style={topBar}>
           <SearchBar />
-          <Button style={loginButton}>{LOGIN}</Button>
-          <Button style={signUpButton}>{SIGNUP}</Button>
+          {user ? (
+            <ProfileIndicator host />
+          ) : (
+            <>
+              <Button style={loginButton}>{LOGIN}</Button>
+              <Button style={signUpButton}>{SIGNUP}</Button>
+            </>
+          )}
         </div>
         {searchResult?.length === 0 && <ContainerSwitcher />}
         <MusicContainer list={displayList} />

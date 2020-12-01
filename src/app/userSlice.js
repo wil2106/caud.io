@@ -6,7 +6,7 @@ import { authenticate, register } from './../api/auth'
  * Should remove value before production commits
  */
 const defaultUser = {
-  login: '',
+  login: 'RANDOM',
   description: '',
   token: '',
   userMusicsIDs: [],
@@ -37,7 +37,7 @@ export const authificate = (login, password) => async (dispatch) => {
   dispatch(updateUser({ login: res.login, token: res.token }))
 }
 // Export selectors
-export const selectLogin = (state) => state.user.login
+export const selectLogin = (state) => state.User?.login
 
 // Export default reducers
 export default userSlice.reducer
