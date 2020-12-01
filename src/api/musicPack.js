@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { Error } from '../../server/db'
 
 export const retrieveRecentMusics = async (page) => {
   let res
