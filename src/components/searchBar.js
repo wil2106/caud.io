@@ -13,7 +13,7 @@ export default function SearchBar(props) {
    * State
    */
   const [input, setInput] = useState('')
-  const [background, setBackground] = useState('')
+  const [background, setBackground] = useState(BACKGROUND_INACTIVE)
   const ref = React.createRef()
 
   /**
