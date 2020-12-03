@@ -36,7 +36,7 @@ function like(req, res) {
   let notification = {
     action: req.body.action,
     fk_user: req.body.fk_user,
-    fk_emitter: req.body.fk_emmiter,
+    fk_emitter: req.body.fk_emitter,
     fk_music: req.body.id
 
   }
@@ -44,7 +44,22 @@ function like(req, res) {
     if(data==0) {
       return res.status(404).send({error: 'No music with this id'});
     }
-    res.status(204).send();
+  });
+  musicService.notify(notification).then(data => res.send(data));
+}
+
+function fork(req, res) {
+  let notification = {
+    action: req.body.action,
+    fk_user: req.body.fk_user,
+    fk_emitter: req.body.fk_emitter,
+    fk_music: req.body.id
+
+  }
+  musicService.fork(req.body.id).then(data => {
+    if(data==0) {
+      return res.status(404).send({error: 'No music with this id'});
+    }
   });
   musicService.notify(notification).then(data => res.send(data));
 }
@@ -98,6 +113,7 @@ module.exports = {
     createMusic,
     like,
     listen,
+    fork,
     mostLike,
     mostRecent,
     mostFork,
