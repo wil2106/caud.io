@@ -8,6 +8,11 @@ const like = (id_) => Music.update({
     where: {id: id_}
 });
 
+const fork = (id_) => Music.update({ 
+    nb_forks: sequelize.literal('nb_forks + 1')}, {
+    where: {id: id_}
+});
+
 const notify = notification => Notification.create(notification);
 
 const listen = id_ => Music.update({ nb_listen: sequelize.literal('nb_listen + 1')}, {
@@ -55,4 +60,4 @@ const musicContent = id_ => Music.findAll({
     where: {id: id_}
 })
 
-module.exports = {like, notify, add, listen, mostLike, mostRecent, mostFork, mostListen, fullMusic, musicContent};
+module.exports = {like, notify, add, listen, fork, mostLike, mostRecent, mostFork, mostListen, fullMusic, musicContent};
