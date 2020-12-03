@@ -36,7 +36,7 @@ function like(req, res) {
   let notification = {
     action: req.body.action,
     fk_user: req.body.fk_user,
-    fk_emitter: req.body.fk_emmiter,
+    fk_emitter: req.body.fk_emitter,
     fk_music: req.body.id
 
   }
@@ -44,7 +44,22 @@ function like(req, res) {
     if(data==0) {
       return res.status(404).send({error: 'No music with this id'});
     }
-    res.status(204).send();
+  });
+  musicService.notify(notification).then(data => res.send(data));
+}
+
+function fork(req, res) {
+  let notification = {
+    action: req.body.action,
+    fk_user: req.body.fk_user,
+    fk_emitter: req.body.fk_emitter,
+    fk_music: req.body.id
+
+  }
+  musicService.fork(req.body.id).then(data => {
+    if(data==0) {
+      return res.status(404).send({error: 'No music with this id'});
+    }
   });
   musicService.notify(notification).then(data => res.send(data));
 }
@@ -94,13 +109,35 @@ function getFullMusic(req, res) {
   });
 }
 
+function getMusicContent(req, res) {
+  let musicContent = {
+    music: null,
+    samples: []
+  }
+  Promise.all([musicService.musicContent(req.params.id), libraryService.getSamplesForMusic(req.params.id)])
+  .then(data => {
+    musicContent.music = data[0];
+    Promise.all(data[1].map(x => x.dataValues.sampleId).map(s => {
+      return sampleService.getById(s);
+    }))
+    .then(samplesData => {
+      samplesData.forEach(sampleData => {
+        musicContent.samples.push(sampleData);
+      })
+      res.send(musicContent);
+    });
+  });
+}
+
 module.exports = {
     createMusic,
     like,
     listen,
+    fork,
     mostLike,
     mostRecent,
     mostFork,
     mostListen,
-    getFullMusic
+    getFullMusic,
+    getMusicContent
 }
