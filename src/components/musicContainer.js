@@ -4,11 +4,20 @@ import { debounce } from 'lodash'
 import { useDispatch } from 'react-redux'
 import { requestNextPage } from './../app/musicPackSlice'
 import EmptyContainer from './emptyContainer'
+import { useSelector } from 'react-redux'
+import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+import {
+  selectLoading
+} from '../app/musicPackSlice'
 
 export default function MusicContainer(props) {
   // List passed should be a list of musicIDs (see redux store)
   const { list } = props
   const [scrollPosition, setScrollPosition] = useState(0)
+
+  const loading = useSelector(selectLoading)
 
   const dispatch = useDispatch()
   const containerRef = useRef(null)
@@ -48,8 +57,13 @@ export default function MusicContainer(props) {
   }, 500)
 
   return useMemo(() => (
-    <div style={container} onScroll={onScroll} ref={containerRef}>
-      {list.length ? CardRender : <EmptyContainer />}
-    </div>
+    <React.Fragment>
+      <div style={container} onScroll={onScroll} ref={containerRef}>
+        {list.length ? CardRender : <EmptyContainer />}
+        <Box display="flex" justifyContent="center" width={1} m={2}>
+          {loading && <CircularProgress style={{'color': '#47CF73'}}/>}
+        </Box>
+      </div>
+    </React.Fragment>
   ))
 }
