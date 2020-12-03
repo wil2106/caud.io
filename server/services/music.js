@@ -55,4 +55,9 @@ const fullMusic = id_ => Music.findAll({
     where: {id: id_}
 });
 
-module.exports = {like, notify, add, listen, fork, mostLike, mostRecent, mostFork, mostListen, fullMusic};
+const musicContent = id_ => Music.findAll({
+    attributes: ["setup_code", "step_code"],
+    where: {id: id_}
+})
+
+module.exports = {like, notify, add, listen, fork, mostLike, mostRecent, mostFork, mostListen, fullMusic, musicContent};

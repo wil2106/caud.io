@@ -10,6 +10,7 @@ router.post('/music/fork',authMiddleware.checkAuth , musicController.fork)
 router.post('/music',authMiddleware.checkAuth, musicController.createMusic)
 router.post('/music/listen',authMiddleware.checkAuth , musicController.listen)
 
+router.get('/music/content/:id', authMiddleware.checkAuth, musicController.getMusicContent)
 router.get('/music/:id', authMiddleware.checkAuth, musicController.getFullMusic)
 router.get('/music/mostLike',authMiddleware.checkAuth , musicController.mostLike)
 router.get('/music/mostRecent',authMiddleware.checkAuth , musicController.mostRecent)
