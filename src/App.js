@@ -9,12 +9,16 @@ import {
 import Home from './pages/home'
 import { useSelector } from 'react-redux'
 import { selectLogin } from './app/userSlice'
+import ProfilePage from './pages/profile'
 
 function App() {
   return (
     <div className="App">
       <Router>
         <Switch>
+          <PrivateRoute exact path="/profile">
+            <ProfilePage />
+          </PrivateRoute>
           <Route path="/">
             <Home />
           </Route>
@@ -36,7 +40,7 @@ function PrivateRoute({ children, ...rest }) {
         ) : (
           <Redirect
             to={{
-              pathname: '/login', //Redirection to default path
+              pathname: '/home', //Redirection to default path
               state: { from: location },
             }}
           />

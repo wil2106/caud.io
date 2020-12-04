@@ -1,12 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
+import { RandomColor } from '../components/hooks/useRandomColor'
 /**
  * Default state of User
  * Note: the values are purely for debugging purpose, everything should be either empty array either null
  * Should remove value before production commits
  */
+
+const color = RandomColor()
 const defaultUser = {
-  login: 'RANDOM',
+  login: '',
   description: '',
   token: '',
   userMusicsIDs: [],
@@ -14,6 +17,7 @@ const defaultUser = {
   loginError: '',
   signUpLoading: false,
   signUpError: '',
+  color,
 }
 
 // Create User redux slice
@@ -121,6 +125,7 @@ export const selectLoginLoading = (state) => state.User.loginLoading
 export const selectSignUpLoading = (state) => state.User.signUpLoading
 export const selectLoginError = (state) => state.User.loginError
 export const selectSignUpError = (state) => state.User.signupError
+export const selectUserColor = (state) => state.User.color
 
 // Export default reducers
 export default userSlice.reducer

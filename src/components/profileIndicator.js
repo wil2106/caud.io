@@ -2,19 +2,22 @@ import React, { useState } from 'react'
 import { Menu, MenuItem } from '@material-ui/core'
 import Crown from './../assets/picture/crown.png'
 import { useSelector, useDispatch } from 'react-redux'
-import { logout, selectLogin } from '../app/userSlice'
+import { logout, selectLogin, selectUserColor } from '../app/userSlice'
+import { useHistory } from 'react-router-dom'
 
 export default function ProfileIndicator(props) {
   const { host } = props
   const [anchorEl, setAnchorEl] = useState(null)
   const user = useSelector(selectLogin)
+  const color = useSelector(selectUserColor)
   const dispatch = useDispatch()
+  const history = useHistory()
 
   const container = {
     height: 40,
     width: 40,
     borderRadius: 26,
-    backgroundColor: '#fff',
+    backgroundColor: color,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -23,7 +26,7 @@ export default function ProfileIndicator(props) {
 
   const title = {
     fontSize: 18,
-    color: '#000',
+    color: '#fff',
   }
 
   const crownStyle = {
@@ -36,6 +39,7 @@ export default function ProfileIndicator(props) {
 
   const handleProfile = () => {
     setAnchorEl(null)
+    history.push('/profile')
   }
 
   const handleAccount = () => {
@@ -50,7 +54,10 @@ export default function ProfileIndicator(props) {
   const handleClick = (event) => setAnchorEl(event.currentTarget)
 
   return (
-    <div style={{ position: 'relative', marginRight: 10, marginLeft: 10 }}>
+    <div
+      style={{ position: 'relative', marginRight: 10, marginLeft: 10 }}
+      alt={user}
+    >
       {host && (
         <img
           src={Crown}
@@ -71,7 +78,6 @@ export default function ProfileIndicator(props) {
         anchorEl={anchorEl}
       >
         <MenuItem onClick={handleProfile}>Profile</MenuItem>
-        <MenuItem onClick={handleAccount}>My account</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>

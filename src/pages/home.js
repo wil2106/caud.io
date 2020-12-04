@@ -98,7 +98,7 @@ export default function Home(props) {
           </Box>
           {/*<Box flexGrow={1}><SearchBar placeHolder="Search"/></Box>*/}
           {userLogin ? (
-            <ProfileIndicator host />
+            <ProfileIndicator />
           ) : (
             <React.Fragment>
               <Box>
