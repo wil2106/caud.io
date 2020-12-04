@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
 import { Menu, MenuItem } from '@material-ui/core'
 import Crown from './../assets/picture/crown.png'
+import { useSelector } from 'react-redux'
+import { selectLogin } from '../app/userSlice'
 
 export default function ProfileIndicator(props) {
   const { host } = props
   const [anchorEl, setAnchorEl] = useState(null)
+  const user = useSelector(selectLogin)
 
   const container = {
     height: 40,
