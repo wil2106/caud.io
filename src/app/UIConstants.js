@@ -1,4 +1,4 @@
-import { Person, Explore } from '@material-ui/icons'
+import { MenuBook, Explore, Info } from '@material-ui/icons'
 
 /**
  * List of javascript navigation driven pages
@@ -9,8 +9,12 @@ export const pages = [
     title: 'Explore',
   },
   {
-    icon: Person,
-    title: 'Profile',
+    icon: MenuBook,
+    title: 'Doc',
+  },
+  {
+    icon: Info,
+    title: 'About',
   },
 ]
 

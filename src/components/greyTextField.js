@@ -9,11 +9,13 @@ const BACKGROUND_INACTIVE = '#252830'
 const BACKGROUND_HOVERED = '#393c45'
 
 export default function SearchBar(props) {
+
+  const { placeHolder, handleChange } = props; 
   /**
    * State
    */
   const [input, setInput] = useState('')
-  const [background, setBackground] = useState('')
+  const [background, setBackground] = useState(BACKGROUND_INACTIVE)
   const ref = React.createRef()
 
   /**
@@ -37,7 +39,6 @@ export default function SearchBar(props) {
     display: 'flex',
     marginLeft: 25,
     marginRight: 10,
-    flexGrow: 1,
     backgroundColor: background,
     height: 40,
     borderRadius: 6,
@@ -55,7 +56,6 @@ export default function SearchBar(props) {
     outline: 'none',
     fontFamily: 'Roboto',
     height: '100%',
-    flexGrow: 1,
     backgroundColor: '#fff0',
     margin: 0,
   }
@@ -79,7 +79,7 @@ export default function SearchBar(props) {
         onChange={onInputChange}
         onSubmit={onInputSubmit}
         style={inputStyle}
-        placeholder="Search"
+        placeholder={placeHolder}
         onFocus={onFocus}
       />
       {input && <CancelIcon style={iconStyle} onClick={iconOnClick} />}
