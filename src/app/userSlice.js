@@ -97,6 +97,14 @@ export const signMeUp = (login, password, successCb) => dispatch => {
   
 };
 
+// Export auth related async thunks
+export const authificate = (login, password) => async (dispatch) => {
+  // TODO: Login and password format checking
+
+  // Api call
+  const res = await authenticate(login, password)
+  dispatch(updateUser({ login: res.login, token: res.token }))
+}
 // Export selectors
 export const selectLogin = (state) => state.User.login
 export const selectLoginLoading = (state) => state.User.loginLoading

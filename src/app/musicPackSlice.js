@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { retrieveMusicObject, retrieveRecentMusics } from '../api/musicPack'
 import { containers } from './UIConstants'
 
 /**
@@ -16,6 +17,7 @@ const defaultMusicPack = {
       nb_forks: 10,
       nb_likes: 10,
       nb_listen: 10,
+      lightMusicObject: null,
     },
   ],
   mostRecentIDs: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -39,11 +41,31 @@ export const musicPackSlice = createSlice({
       const { loading } = action.payload
       state.loading = loading
     },
+    clearRecentIDs: (state) => {
+      state.mostRecentIDs = []
+    },
+    updateMusicObject: (state, action) => {
+      const { data } = action.payload
+      // Experimental merging objects
+      data.forEach((element) => {
+        const musicObject = state.musics.find(
+          (music) => music.id === element.id
+        )
+        if (musicObject) {
+          musicObject['lightMusicObject'] = data['lightMusicObject']
+        }
+      })
+    },
   },
 })
 
 // Export Actions
-export const { addToList, setLoading } = musicPackSlice.actions
+export const {
+  addToList,
+  setLoading,
+  clearRecentIDs,
+  updateMusicObject,
+} = musicPackSlice.actions
 
 // Export thunks
 export const requestNextPage = () => async (dispatch, getState) => {
@@ -78,6 +100,23 @@ export const requestNextPage = () => async (dispatch, getState) => {
     })
   )
   await dispatch(setLoading({ loading: false }))
+}
+
+export const reloadRecentIDs = () => async (dispatch) => {
+  dispatch(clearRecentIDs())
+  const res = await retrieveRecentMusics(1)
+  dispatch(
+    addToList({
+      listName: 'mostRecentIDs',
+      elements: res,
+    })
+  )
+}
+
+export const retrieveLightMusicObjectFromIDs = (ids) => async (dispatch) => {
+  // Retrieve object
+  const res = await retrieveMusicObject(ids)
+  dispatch(updateMusicObject(res))
 }
 
 // Export selectors

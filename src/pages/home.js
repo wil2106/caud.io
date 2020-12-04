@@ -20,7 +20,6 @@ import Box from '@material-ui/core/Box';
 import Snackbar from '@material-ui/core/Snackbar';
 
 
-
 export default function Home(props) {
   /**
    * State
@@ -29,6 +28,7 @@ export default function Home(props) {
   const musicList = useSelector(selectCurrentList)
   const userLogin = useSelector(selectLogin)
   const displayList = searchResult?.length === 0 ? musicList : searchResult
+  const user = useSelector(selectLogin)
 
   const [openSignUpDialog, setOpenSignUpDialog] = React.useState(false);
   const [openLoginDialog, setOpenLoginDialog] = React.useState(false);
@@ -103,7 +103,6 @@ export default function Home(props) {
                 <Box><GreyButton onClick={handleOpenSignUpDialog} text="SIGN UP"/></Box>
               </React.Fragment>
             }
-            
         </div>
         {searchResult?.length === 0 && <ContainerSwitcher />}
         <MusicContainer list={displayList} />
