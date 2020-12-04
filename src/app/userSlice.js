@@ -6,7 +6,7 @@ import axios from 'axios'
  * Should remove value before production commits
  */
 const defaultUser = {
-  login: '',
+  login: 'RANDOM',
   description: '',
   token: '',
   userMusicsIDs: [],
@@ -40,7 +40,7 @@ export const userSlice = createSlice({
       state.login = action.payload
     },
     setUserData: (state, action) => {
-      const {login, token} = action.payload
+      const { login, token } = action.payload
       state.login = login
       state.token = token
     },
@@ -48,63 +48,73 @@ export const userSlice = createSlice({
 })
 
 // Export Actions
-export const { setLoginLoading, setLoginError, setSignUpLoading, setSignUpError, setUserData} = userSlice.actions
+export const {
+  setLoginLoading,
+  setLoginError,
+  setSignUpLoading,
+  setSignUpError,
+  setUserData,
+} = userSlice.actions
 
 // Export thunks
 
-export const logMeIn = (login, password, successCb) => dispatch => {
-  dispatch(setLoginLoading(true));
+export const logMeIn = (login, password, successCb) => (dispatch) => {
+  dispatch(setLoginLoading(true))
 
-  axios.post('/api/login', {
-    login: login,
-    password: password
-  })
-  .then(function (response) {
-      dispatch(setLoginLoading(false));
-      dispatch(setUserData({login: login, token: response.data.data.token}))
+  axios
+    .post('/api/login', {
+      login: login,
+      password: password,
+    })
+    .then(function (response) {
+      dispatch(setLoginLoading(false))
+      dispatch(setUserData({ login: login, token: response.data.data.token }))
       successCb()
-  })
-  .catch(function (error) {
-    if (error.response.status === 401) {
-      dispatch(setLoginError('The username or password you entered is incorrect, please try again'))
-    }else{
-      dispatch(setLoginError('Internal error, please try again'))
-    }
-    dispatch(setLoginLoading(false));
-  });
-  
-};
-
-export const signMeUp = (login, password, successCb) => dispatch => {
-  dispatch(setSignUpLoading(true));
-
-  axios.post('/api/register', {
-    login: login,
-    password: password
-  })
-  .then(function (response) {
-      dispatch(setSignUpLoading(false));
-      successCb();
-  })
-  .catch(function (error) {
-    if (error.response.status === 409) {
-      dispatch(setSignUpError('Registration failed. User with this login already registered'))
-    }else{
-      dispatch(setSignUpError('Internal error, please try again'))
-    }
-    dispatch(setSignUpLoading(false));
-  });
-  
-};
-
-// Export auth related async thunks
-export const authificate = (login, password) => async (dispatch) => {
-  // TODO: Login and password format checking
-
-  // Api call
-  const res = await authenticate(login, password)
-  dispatch(updateUser({ login: res.login, token: res.token }))
+    })
+    .catch(function (error) {
+      if (error.response.status === 401) {
+        dispatch(
+          setLoginError(
+            'The username or password you entered is incorrect, please try again'
+          )
+        )
+      } else {
+        dispatch(setLoginError('Internal error, please try again'))
+      }
+      dispatch(setLoginLoading(false))
+    })
 }
+
+export const signMeUp = (login, password, successCb) => (dispatch) => {
+  dispatch(setSignUpLoading(true))
+
+  axios
+    .post('/api/register', {
+      login: login,
+      password: password,
+    })
+    .then(function (response) {
+      dispatch(setSignUpLoading(false))
+      successCb()
+    })
+    .catch(function (error) {
+      if (error.response.status === 409) {
+        dispatch(
+          setSignUpError(
+            'Registration failed. User with this login already registered'
+          )
+        )
+      } else {
+        dispatch(setSignUpError('Internal error, please try again'))
+      }
+      dispatch(setSignUpLoading(false))
+    })
+}
+
+export const logout = () => (dispatch) => {
+  dispatch(setUserData({ login: '', token: '' }))
+}
+
 // Export selectors
 export const selectLogin = (state) => state.User.login
 export const selectLoginLoading = (state) => state.User.loginLoading

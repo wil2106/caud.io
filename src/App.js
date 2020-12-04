@@ -7,7 +7,8 @@ import {
   Redirect,
 } from 'react-router-dom'
 import Home from './pages/home'
-import useAuth from './components/hooks/useAuth'
+import { useSelector } from 'react-redux'
+import { selectLogin } from './app/userSlice'
 
 function App() {
   return (
@@ -25,12 +26,12 @@ function App() {
 
 // Private routes for some pages
 function PrivateRoute({ children, ...rest }) {
-  let auth = useAuth()
+  let auth = useSelector(selectLogin)
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        auth.user ? (
+        auth ? (
           children
         ) : (
           <Redirect

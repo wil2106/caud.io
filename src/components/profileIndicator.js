@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { Menu, MenuItem } from '@material-ui/core'
 import Crown from './../assets/picture/crown.png'
-import { useSelector } from 'react-redux'
-import { selectLogin } from '../app/userSlice'
+import { useSelector, useDispatch } from 'react-redux'
+import { logout, selectLogin } from '../app/userSlice'
 
 export default function ProfileIndicator(props) {
   const { host } = props
   const [anchorEl, setAnchorEl] = useState(null)
   const user = useSelector(selectLogin)
+  const dispatch = useDispatch()
 
   const container = {
     height: 40,
@@ -32,6 +33,20 @@ export default function ProfileIndicator(props) {
   }
 
   const handleClose = () => setAnchorEl(null)
+
+  const handleProfile = () => {
+    setAnchorEl(null)
+  }
+
+  const handleAccount = () => {
+    setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    setAnchorEl(null)
+    dispatch(logout())
+  }
+
   const handleClick = (event) => setAnchorEl(event.currentTarget)
 
   return (
@@ -46,7 +61,7 @@ export default function ProfileIndicator(props) {
         />
       )}
       <div style={container} onClick={handleClick}>
-        <p style={title}>WS</p>
+        <p style={title}>{user.substring(0, 1)}</p>
       </div>
       <Menu
         id="simple-menu"
@@ -55,9 +70,9 @@ export default function ProfileIndicator(props) {
         onClose={handleClose}
         anchorEl={anchorEl}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        <MenuItem onClick={handleProfile}>Profile</MenuItem>
+        <MenuItem onClick={handleAccount}>My account</MenuItem>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>
   )
