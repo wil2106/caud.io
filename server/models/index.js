@@ -44,11 +44,6 @@ Sample.belongsToMany(Music, { through: Library });
 sequelize.sync({ force: false })
   .then(() => {
     console.log(`Database & tables created!`)
-    Sample
-    .create({ title: 'test_sample' })
-    .then(function(samp) {
-        console.log('test sample created')
-    })
 })
 
 module.exports = {

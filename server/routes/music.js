@@ -17,4 +17,6 @@ router.get('/music/mostRecent',authMiddleware.checkAuth , musicController.mostRe
 router.get('/music/mostFork',authMiddleware.checkAuth , musicController.mostFork)
 router.get('/music/mostListen',authMiddleware.checkAuth , musicController.mostListen)
 
+router.delete('/music/delete/:id', authMiddleware.checkAuth, musicController.deleteMusic)
+
 module.exports = router

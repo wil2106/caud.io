@@ -32,6 +32,18 @@ function createMusic(req, res) {
   });
 }
 
+function deleteMusic(req, res) {
+  libraryService.getUniqueSampleForMusic(parseInt(req.params.id))
+  .then(result => {
+    result[0].forEach(sample => {
+      sampleService.deleteSample(sample.sampleId)
+    });
+  })
+  .then(musicService.deleteMusic(req.params.id))
+  .then(libraryService.deleteLibraryForMusic(req.params.id))
+  .then(data => res.send(data));
+}
+
 function like(req, res) {
   let notification = {
     action: req.body.action,
@@ -139,5 +151,6 @@ module.exports = {
     mostFork,
     mostListen,
     getFullMusic,
-    getMusicContent
+    getMusicContent,
+    deleteMusic
 }
