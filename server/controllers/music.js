@@ -1,29 +1,43 @@
 const musicService = require('../services/music');
 const libraryService = require('../services/library');
 const sampleService = require('../services/sample');
+const {
+  getPagination,
+  getPaginationData,
+} = require('./../middlewares/pagination')
 
 function createMusic(req, res) {
+  const {
+    title,
+    setup_code,
+    step_code,
+    can_fork,
+    private,
+    image,
+    fk_author,
+    samples,
+  } = req.body
+
   let music = {
-    title: req.body.title,
+    title,
     nb_likes: 0,
     nb_forks: 0,
     nb_listen: 0,
-    setup_code: req.body.setup_code,
-    step_code: req.body.step_code,
-    can_fork: req.body.can_fork,
-    private: req.body.private,
-    image: req.body.image,
-    fk_author: req.body.fk_author
+    setup_code,
+    step_code,
+    can_fork,
+    private,
+    image,
+    fk_author,
   }
 
   musicService.add(music)
   .then(musicData => {
-    req.body.samples.forEach(sample => {
-      sampleService.add(sample)
-      .then(sampleData => {
-        libraryService.add({musicId: musicData.id, sampleId: sampleData.id })
-      });    
-    });
+    samples.forEach((sample) => {
+      sampleService.add(sample).then((sampleData) => {
+        libraryService.add({ musicId: musicData.id, sampleId: sampleData.id })
+      })
+    })
   })
   .then(data => res.send(data))
   .catch(err => {
@@ -74,7 +88,12 @@ function listen(req, res) {
 }
 
 function mostLike(req, res) {
-  musicService.mostLike().then(data => res.send(data));
+  const { page, size } = req.query
+  const { limit, offset } = getPagination(page, size)
+  musicService.mostLike(limit, offset).then((data) => {
+    const response = getPaginationData(data, page, limit)
+    res.send(response)
+  })
 }
 
 function mostRecent(req, res) {

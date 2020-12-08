@@ -19,12 +19,13 @@ const listen = id_ => Music.update({ nb_listen: sequelize.literal('nb_listen + 1
     where: {id: id_}
 });
 
-const mostLike = () => Music.findAll({
+const mostLike = (limit, offset) => Music.findAll({
     attributes: ['id'],
     order: [
         ['nb_likes', 'DESC']
     ],
-    limit: 10
+    limit,
+    offset
 });
 
 const mostRecent = () => Music.findAll({
