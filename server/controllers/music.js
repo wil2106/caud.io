@@ -46,6 +46,19 @@ function createMusic(req, res) {
   });
 }
 
+
+function deleteMusic(req, res) {
+  libraryService.getUniqueSampleForMusic(parseInt(req.params.id))
+  .then(result => {
+    result[0].forEach(sample => {
+      sampleService.deleteSample(sample.sampleId)
+    });
+  })
+  .then(musicService.deleteMusic(req.params.id))
+  .then(libraryService.deleteLibraryForMusic(req.params.id))
+  .then(data => res.send(data));
+}
+
 function updateMusic(req, res) {
   let music = {
     title: req.body.title,
@@ -65,7 +78,6 @@ function updateMusic(req, res) {
       },
       sample.id)    
   });
-}
 
 function like(req, res) {
   let notification = {
@@ -180,5 +192,6 @@ module.exports = {
     mostFork,
     mostListen,
     getFullMusic,
-    getMusicContent
+    getMusicContent,
+    deleteMusic
 }
