@@ -32,6 +32,27 @@ function createMusic(req, res) {
   });
 }
 
+function updateMusic(req, res) {
+  let music = {
+    title: req.body.title,
+    setup_code: req.body.setup_code,
+    step_code: req.body.step_code,
+    can_fork: req.body.can_fork,
+    private: req.body.private,
+    image: req.body.image
+  }
+  musicService.updateMusic(music, req.params.id).then(data => res.send(data));
+
+  req.body.samples.forEach(sample => {
+    sampleService.update(
+      {
+      title: sample.title,
+      file:  sample.file
+      },
+      sample.id)    
+  });
+}
+
 function like(req, res) {
   let notification = {
     action: req.body.action,
@@ -131,6 +152,7 @@ function getMusicContent(req, res) {
 
 module.exports = {
     createMusic,
+    updateMusic,
     like,
     listen,
     fork,

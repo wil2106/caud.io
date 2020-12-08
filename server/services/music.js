@@ -3,6 +3,11 @@ const sequelize = require('../db');
 
 const add = music => Music.create(music);
 
+const updateMusic = (music, id_) => Music.update( 
+    music,
+    {where: {id: id_}}
+);
+
 const like = (id_) => Music.update({ 
     nb_likes: sequelize.literal('nb_likes + 1')}, {
     where: {id: id_}
@@ -60,4 +65,4 @@ const musicContent = id_ => Music.findAll({
     where: {id: id_}
 })
 
-module.exports = {like, notify, add, listen, fork, mostLike, mostRecent, mostFork, mostListen, fullMusic, musicContent};
+module.exports = {like, notify, add, updateMusic, listen, fork, mostLike, mostRecent, mostFork, mostListen, fullMusic, musicContent};
