@@ -78,6 +78,7 @@ function updateMusic(req, res) {
       },
       sample.id)    
   });
+}
 
 function like(req, res) {
   let notification = {
