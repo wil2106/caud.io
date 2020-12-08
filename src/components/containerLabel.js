@@ -72,7 +72,9 @@ export default function ContainerLabel(props) {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <h1 style={titleStyle}>{title}</h1>
+      <h1 style={titleStyle} className="noSelect">
+        {title}
+      </h1>
       {selected && <div style={flagStyle} />}
     </div>
   )
