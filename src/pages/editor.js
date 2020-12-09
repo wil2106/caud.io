@@ -22,7 +22,6 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
-import Alert from '@material-ui/lab/Alert';
 import HelpIcon from '@material-ui/icons/Help';
 import Tooltip from '@material-ui/core/Tooltip';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
@@ -186,7 +185,6 @@ export default function Editor(props) {
               name="UNIQUE_ID_OF_DIV"
               editorProps={{ $blockScrolling: true }}
             />
-            <Alert severity="error">This is an error alert — check it out!</Alert>
           </Box>
           <Box m={1}>
             <Box className={classes.editorMenu}>
@@ -206,7 +204,6 @@ export default function Editor(props) {
               name="UNIQUE_ID_OF_DIV2"
               editorProps={{ $blockScrolling: true }}
             />
-            <Alert severity="warning">This is an error alert — check it out!</Alert>
           </Box>
         </Box>
       </div>
