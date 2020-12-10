@@ -7,14 +7,15 @@ import EmptyContainer from './emptyContainer'
 import { useSelector } from 'react-redux'
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { selectCurrentList, selectLoading } from '../app/musicPackSlice'
+import { selectLoading } from '../app/musicPackSlice'
+import { selectCurrentContainerName } from '../app/uiController'
 
-import {
-  selectLoading
-} from '../app/musicPackSlice'
-
-export default function MusicContainer(props) {
+export default function MusicContainer() {
   // List passed should be a list of musicIDs (see redux store)
-  const { list } = props
+  const musicList = useSelector(selectCurrentList)
+  const musicListName = useSelector(selectCurrentContainerName)
+  const list = searchResult?.length === 0 ? musicList : searchResult
   const [scrollPosition, setScrollPosition] = useState(0)
 
   const loading = useSelector(selectLoading)
@@ -25,7 +26,7 @@ export default function MusicContainer(props) {
   // Dynamic resource loading
   useEffect(() => {
     if (scrollPosition >= 0.9) {
-      dispatch(requestNextPage())
+      dispatch(requestNextPage(musicListName))
       setScrollPosition(0)
     }
   }, [scrollPosition])
@@ -61,7 +62,7 @@ export default function MusicContainer(props) {
       <div style={container} onScroll={onScroll} ref={containerRef}>
         {list.length ? CardRender : <EmptyContainer />}
         <Box display="flex" justifyContent="center" width={1} m={2}>
-          {loading && <CircularProgress style={{'color': '#47CF73'}}/>}
+          {loading && <CircularProgress style={{ color: '#47CF73' }} />}
         </Box>
       </div>
     </React.Fragment>

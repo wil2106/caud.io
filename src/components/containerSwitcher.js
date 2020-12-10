@@ -26,7 +26,7 @@ export default function ContainerSwitcher(props) {
   return (
     <div style={container}>
       {containers.map((element, key) => (
-        <ContainerLabel title={element.name} key={key} />
+        <ContainerLabel list={element} key={key} />
       ))}
       <div style={underline} />
     </div>

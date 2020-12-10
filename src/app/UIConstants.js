@@ -29,6 +29,7 @@ export const containers = [
   {
     name: 'Most liked',
     list: 'mostLikedIDs',
+    apiRoute: 'mostLike',
   },
   {
     name: 'Most listened',

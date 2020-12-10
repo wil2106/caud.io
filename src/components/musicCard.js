@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import FavoriteIcon from '@material-ui/icons/Favorite'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import ForkIcon from './../assets/svg/fork'
+import btoa from 'btoa'
 
 export default function MusicCard(props) {
   const { musicID } = props
@@ -11,9 +12,7 @@ export default function MusicCard(props) {
    * State
    */
   const [hover, setHover] = useState(false)
-  const musicObject = useSelector((state) =>
-    state.MusicPack.musics.find((element) => element.id === musicID)
-  )
+  const musicObject = useSelector((state) => state.MusicPack.musics[musicID])
 
   /**
    * Style
@@ -109,6 +108,17 @@ export default function MusicCard(props) {
   const onMouseLeave = () => setHover(false)
   const onPlayButtonClick = () => {}
 
+  const imageBuffer = (arr) => {
+    if (!arr?.length) return
+    return btoa(
+      arr.reduce((data, byte) => data + String.fromCharCode(byte), '')
+    )
+  }
+
+  const imageString = `data:image/png;base64, ${imageBuffer(
+    musicObject.image?.data
+  )}`
+
   return (
     <div
       style={container}
@@ -117,7 +127,7 @@ export default function MusicCard(props) {
     >
       <div style={containerWrapper}>
         <div style={{ width: '100%', position: 'relative' }}>
-          <img src={musicObject.image} style={imageStyle} />
+          <img src={imageString} style={imageStyle} />
           {hover && (
             <ButtonBase style={playButtonStyle} onClick={onPlayButtonClick}>
               <PlayArrowIcon style={{ color: '#fff' }} />
