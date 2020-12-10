@@ -7,6 +7,11 @@ const deleteUser = id_ => Users.destroy({
     where: { id: id_ }
 });
 
+const getUserLoginById = id_ => Users.findOne({ 
+    attributes: ["login"],
+    where: { id: id_ }
+});
+
 const updateUser = (user, id_) => Users.update(
     user,
     {where: {id: id_}}
@@ -16,5 +21,6 @@ module.exports = {
     addUser,
     getUserByLogin,
     deleteUser,
-    updateUser
+    updateUser,
+    getUserLoginById
 }
