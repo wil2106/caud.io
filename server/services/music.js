@@ -34,32 +34,33 @@ const mostLike = (limit, offset) => Music.findAll({
         ['nb_likes', 'DESC']
     ],
     limit,
-    offset
+    offset,
+    where: {private: false}
 });
 
 const mostRecent = () => Music.findAll({
-    attributes: ['id'],
     order: [
         ['createdAt', 'ASC']
     ],
-    limit: 10
-})
+    limit: 10,
+    where: {private: false}
+});
 
 const mostFork = () => Music.findAll({
-    attributes: ['id'],
     order: [
         ['nb_forks', 'DESC']
     ],
-    limit: 10
-})
+    limit: 10,
+    where: {private: false}
+});
 
 const mostListen = () => Music.findAll({
-    attributes: ['id'],
     order: [
         ['nb_listen', 'DESC']
     ],
-    limit: 10
-})
+    limit: 10,
+    where: {private: false}
+});
 
 const fullMusic = id_ => Music.findAll({
     where: {id: id_}
