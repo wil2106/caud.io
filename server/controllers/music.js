@@ -1,6 +1,8 @@
 const musicService = require('../services/music');
 const libraryService = require('../services/library');
 const sampleService = require('../services/sample');
+const userService = require('../services/user');
+
 const {
   getPagination,
   getPaginationData,
@@ -188,6 +190,34 @@ function getMusicContent(req, res) {
   });
 }
 
+function getListOfMusic(req, res) {
+  listMusic = []
+  if(req.body.ids.length == 0) { return res.status(404).send("no id provided") }
+  Promise.all(req.body.ids.map( id => {
+    musicService.fullMusic(id)
+    .then(music => {
+      if(music.length == 0) {
+        return res.status(404).send("one of the musics is either non-existent or private")
+      }
+      if(music[0].dataValues.fk_author == null) {
+        return res.status(404).send("author of one of the music is not specified")
+      }
+      userService.getUserLoginById(music[0].dataValues.fk_author)
+      .then(login => {
+        music[0].dataValues.authorLogin = login.login
+        listMusic.push(music[0])
+        if( listMusic.length == req.body.ids.length ) {
+          return res.send(listMusic)
+        } 
+      })
+      .catch(error => res.send(error));
+    })
+    .catch(error => res.send(error));
+  }))
+  .catch(error => res.send(error));
+}
+
+
 module.exports = {
     createMusic,
     updateMusic,
@@ -200,5 +230,6 @@ module.exports = {
     mostListen,
     getFullMusic,
     getMusicContent,
-    deleteMusic
+    deleteMusic,
+    getListOfMusic
 }
