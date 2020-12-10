@@ -15,35 +15,35 @@ const listen = id_ => Music.update({ nb_listen: sequelize.literal('nb_listen + 1
 });
 
 const mostLike = () => Music.findAll({
-    attributes: ['id'],
     order: [
         ['nb_likes', 'DESC']
     ],
-    limit: 10
+    limit: 10,
+    where: {private: false}
 });
 
 const mostRecent = () => Music.findAll({
-    attributes: ['id'],
     order: [
         ['createdAt', 'ASC']
     ],
-    limit: 10
-})
+    limit: 10,
+    where: {private: false}
+});
 
 const mostFork = () => Music.findAll({
-    attributes: ['id'],
     order: [
         ['nb_forks', 'DESC']
     ],
-    limit: 10
-})
+    limit: 10,
+    where: {private: false}
+});
 
 const mostListen = () => Music.findAll({
-    attributes: ['id'],
     order: [
         ['nb_listen', 'DESC']
     ],
-    limit: 10
-})
+    limit: 10,
+    where: {private: false}
+});
 
 module.exports = {like, notify, add, listen, mostLike, mostRecent, mostFork, mostListen};
