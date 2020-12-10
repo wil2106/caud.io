@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectCurrent, navigate } from './../app/uiController'
 
@@ -34,6 +34,9 @@ export default function NavItem(props) {
     height: 40,
     alignItems: 'center',
     backgroundColor: hover && BACKGROUND_HOVERED,
+    position: 'relative',
+    right: 0,
+    top: 0,
   }
 
   const titleStyle = {
@@ -44,8 +47,8 @@ export default function NavItem(props) {
   }
 
   const flagStyle = {
-    width: 1,
-    height: 14,
+    width: 2,
+    height: '100%',
     backgroundColor: '#47CF73',
     position: 'absolute',
     right: 0,
@@ -59,9 +62,21 @@ export default function NavItem(props) {
   /**
    * Event handlers
    */
-  const onClick = !selected ? () => dispatch(navigate({ page: title })) : null
+  const onClick = !selected
+    ? () => {
+        dispatch(navigate({ page: title }))
+        setHover(false)
+      }
+    : null
   const onMouseEnter = !selected ? () => setHover(true) : null
   const onMouseLeave = !selected ? () => setHover(false) : null
+
+  /**
+   * Use Effects
+   */
+  useEffect(() => {
+    !selected && setHover(false)
+  }, [selected])
 
   return (
     <div
@@ -75,7 +90,9 @@ export default function NavItem(props) {
         height={ICON_SIZE}
         style={{ color: iconFill, paddingLeft: 20 }}
       />
-      <h1 style={titleStyle}>{title}</h1>
+      <h1 style={titleStyle} className="noSelect">
+        {title}
+      </h1>
       {selected && <div style={flagStyle} />}
       {hover && <div style={backgroundFlag} />}
     </div>

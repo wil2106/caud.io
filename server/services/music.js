@@ -3,8 +3,22 @@ const sequelize = require('../db');
 
 const add = music => Music.create(music);
 
+const deleteMusic = id_ => Music.destroy({ 
+    where: { id: id_ }
+});
+
+const updateMusic = (music, id_) => Music.update( 
+    music,
+    {where: {id: id_}}
+);
+
 const like = (id_) => Music.update({ 
     nb_likes: sequelize.literal('nb_likes + 1')}, {
+    where: {id: id_}
+});
+
+const fork = (id_) => Music.update({ 
+    nb_forks: sequelize.literal('nb_forks + 1')}, {
     where: {id: id_}
 });
 
@@ -14,11 +28,13 @@ const listen = id_ => Music.update({ nb_listen: sequelize.literal('nb_listen + 1
     where: {id: id_}
 });
 
-const mostLike = () => Music.findAll({
+const mostLike = (limit, offset) => Music.findAll({
+    attributes: ['id'],
     order: [
         ['nb_likes', 'DESC']
     ],
-    limit: 10,
+    limit,
+    offset,
     where: {private: false}
 });
 
@@ -46,4 +62,13 @@ const mostListen = () => Music.findAll({
     where: {private: false}
 });
 
-module.exports = {like, notify, add, listen, mostLike, mostRecent, mostFork, mostListen};
+const fullMusic = id_ => Music.findAll({
+    where: {id: id_}
+});
+
+const musicContent = id_ => Music.findAll({
+    attributes: ["setup_code", "step_code"],
+    where: {id: id_}
+})
+
+module.exports = {like, notify, add, updateMusic, deleteMusic, listen, fork, mostLike, mostRecent, mostFork, mostListen, fullMusic, musicContent};
