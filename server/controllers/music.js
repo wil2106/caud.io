@@ -149,6 +149,9 @@ function getFullMusic(req, res) {
   }
   Promise.all([musicService.fullMusic(req.params.id), libraryService.getSamplesForMusic(req.params.id)])
   .then(data => {
+    if(data[0].length == 0) {
+      return res.status(404).send({error: 'the music is either non-existent or private'});
+    }
     fullMusic.music = data[0];
     Promise.all(data[1].map(x => x.dataValues.sampleId).map(s => {
       return sampleService.getById(s);

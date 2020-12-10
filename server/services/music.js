@@ -63,7 +63,10 @@ const mostListen = () => Music.findAll({
 });
 
 const fullMusic = id_ => Music.findAll({
-    where: {id: id_}
+    where: {
+        id: id_,
+        private: false
+    }
 });
 
 const musicContent = id_ => Music.findAll({
