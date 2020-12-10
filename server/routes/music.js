@@ -16,6 +16,7 @@ router.get('/music/mostLike',authMiddleware.checkAuth , musicController.mostLike
 router.get('/music/mostRecent',authMiddleware.checkAuth , musicController.mostRecent)
 router.get('/music/mostFork',authMiddleware.checkAuth , musicController.mostFork)
 router.get('/music/mostListen',authMiddleware.checkAuth , musicController.mostListen)
+router.get('/music/searchTitle/:search',authMiddleware.checkAuth , musicController.searchTitle)
 
 router.delete('/music/delete/:id', authMiddleware.checkAuth, musicController.deleteMusic)
 

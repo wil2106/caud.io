@@ -61,6 +61,11 @@ const mostListen = () => Music.findAll({
     limit: 10
 })
 
+const searchTitle = search_ => Music.findAll({
+    attributes: ['id', 'title'],
+    where: {title: search_}
+});
+
 const fullMusic = id_ => Music.findAll({
     where: {id: id_}
 });
@@ -70,4 +75,4 @@ const musicContent = id_ => Music.findAll({
     where: {id: id_}
 })
 
-module.exports = {like, notify, add, updateMusic, deleteMusic, listen, fork, mostLike, mostRecent, mostFork, mostListen, fullMusic, musicContent};
+module.exports = {like, notify, add, updateMusic, deleteMusic, listen, fork, mostLike, mostRecent, mostFork, mostListen, searchTitle, fullMusic, musicContent};
