@@ -4,7 +4,9 @@ import {
   retrieveMusicObject,
   retrieveRecentMusics,
 } from '../api/musicPack'
+import { createBlobURL, imageBufferToBase64 } from '../utils'
 import { containers } from './UIConstants'
+import _ from 'lodash'
 
 /**
  * Default state of Music Pack
@@ -35,7 +37,6 @@ export const musicPackSlice = createSlice({
       const { listName, elements } = action.payload
       elements.forEach((element) => {
         if (!state[listName].includes(element)) {
-          console.log(element)
           state[listName].push(element)
         }
       })
@@ -92,7 +93,10 @@ export const requestNextPage = (listName) => async (dispatch, getState) => {
   dispatch(setLoading({ loading: true }))
 
   // API backend call
-  await retrieveMostList(listName, state.MusicPack[`${listName}Page`])
+  const result = await retrieveMostList(
+    listName,
+    state.MusicPack[`${listName}Page`]
+  )
 
   // Dispatch, parse to redux store
   await dispatch(
@@ -137,8 +141,19 @@ export const requireContainerList = (listName) => async (
 
   try {
     result = await retrieveMostList(listName, page)
-    dispatch(addToMusics(result))
-    dispatch(addToList({ listName, elements }))
+    const blobedArray = await Promise.all(
+      result.data.map(async (element) => {
+        if (element.image) {
+          const url = `data:image/png;base64,${element.image}`
+          const blob = await (await fetch(url)).blob()
+          element.image = createBlobURL(blob)
+        }
+        return element
+      })
+    )
+    const ids = result.data.map((element) => element.id)
+    dispatch(addToMusics(blobedArray))
+    dispatch(addToList({ listName, elements: ids }))
   } catch (err) {
     console.log(err)
   }

@@ -28,15 +28,25 @@ const listen = id_ => Music.update({ nb_listen: sequelize.literal('nb_listen + 1
     where: {id: id_}
 });
 
-const mostLike = (limit, offset) => Music.findAll({
-    attributes: ['id'],
-    order: [
-        ['nb_likes', 'DESC']
-    ],
-    limit,
-    offset,
-    where: {private: false}
-});
+const mostLike = (limit, offset) => 
+  sequelize.query(
+    `SELECT music.id, music.title, music.nb_forks,
+    music.nb_likes, music.nb_listen, music.can_fork,
+    users.login, encode(image, 'base64') as image
+    FROM music, users
+    WHERE music.private=false AND music.fk_author=users.id
+    order by nb_likes DESC
+    OFFSET $offset
+    LIMIT $limit`,
+    {
+        bind: 
+            {
+            limit,
+            offset
+        },
+        type: sequelize.QueryTypes.SELECT
+    }
+  )
 
 const mostRecent = () => Music.findAll({
     order: [

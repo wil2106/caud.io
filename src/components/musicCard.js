@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux'
 import FavoriteIcon from '@material-ui/icons/Favorite'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import ForkIcon from './../assets/svg/fork'
-import btoa from 'btoa'
+import defaultPicture from './../assets/picture/defaultMusic.jpg'
+import { containers } from '../app/UIConstants'
 
 export default function MusicCard(props) {
   const { musicID } = props
@@ -22,7 +23,7 @@ export default function MusicCard(props) {
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    height: 284,
+    height: 350,
     marginLeft: 20,
     marginRight: 20,
     marginTop: !hover && 20,
@@ -30,10 +31,11 @@ export default function MusicCard(props) {
 
   const imageStyle = {
     width: 230,
-    height: 'auto',
+    height: 230,
     filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))',
     marginTop: 10,
     alignSelf: 'center',
+    objectFit: 'cover',
   }
 
   const titleStyle = {
@@ -108,16 +110,10 @@ export default function MusicCard(props) {
   const onMouseLeave = () => setHover(false)
   const onPlayButtonClick = () => {}
 
-  const imageBuffer = (arr) => {
-    if (!arr?.length) return
-    return btoa(
-      arr.reduce((data, byte) => data + String.fromCharCode(byte), '')
-    )
-  }
-
-  const imageString = `data:image/png;base64, ${imageBuffer(
-    musicObject.image?.data
-  )}`
+  const musicPicture = musicObject.image ? musicObject.image : defaultPicture
+  const username = musicObject.login
+    ? musicObject.login.split('@')[0]
+    : 'Default'
 
   return (
     <div
@@ -127,7 +123,7 @@ export default function MusicCard(props) {
     >
       <div style={containerWrapper}>
         <div style={{ width: '100%', position: 'relative' }}>
-          <img src={imageString} style={imageStyle} />
+          <img src={musicPicture} style={imageStyle} />
           {hover && (
             <ButtonBase style={playButtonStyle} onClick={onPlayButtonClick}>
               <PlayArrowIcon style={{ color: '#fff' }} />
@@ -135,7 +131,7 @@ export default function MusicCard(props) {
           )}
         </div>
         <h1 style={titleStyle}>{musicObject.title}</h1>
-        <p style={authorStyle}>{`By ${musicObject.username}`}</p>
+        <p style={authorStyle}>{`By ${username}`}</p>
         {hover ? (
           <div style={buttonsContainer}>
             <Button style={optionStyle}>

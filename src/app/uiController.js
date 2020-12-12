@@ -33,7 +33,8 @@ export const selectCurrent = (state) => state.UIController.current
 export const selectCurrentContainer = (state) =>
   state.UIController.currentContainer
 export const selectCurrentContainerName = (state) =>
-  containers.find((element) => element.name === state.UIController.current).list
+  containers.find((element) => element.name === state.UIController.current)
+    ?.list
 
 // Export default reducers
 export default UISlicer.reducer

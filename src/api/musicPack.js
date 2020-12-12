@@ -18,7 +18,7 @@ export const retrieveRecentMusics = async (page) => {
 export const retrieveMusicObject = async (ids) => {
   let result
   try {
-    result = await axios.get(`/api/music`, {})
+    result = await axios.get(`/api/music/list`, { ids })
   } catch (err) {
     console.log(err)
   }
@@ -32,10 +32,10 @@ export const retrieveMostList = async (listName, page) => {
 
   try {
     res = await axios.get(`/api/music/${apiRoute}?page=${page}`)
+    return res.data
   } catch (err) {
     console.log(err)
   }
 
   // Format: { data: [], totalPages, currentPage, totalItems }
-  return res.data
 }

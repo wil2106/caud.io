@@ -2,19 +2,19 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 import MusicCard from './musicCard'
 import { debounce } from 'lodash'
 import { useDispatch } from 'react-redux'
-import { requestNextPage } from './../app/musicPackSlice'
+import { requestNextPage, selectSearchList } from './../app/musicPackSlice'
 import EmptyContainer from './emptyContainer'
 import { useSelector } from 'react-redux'
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { selectCurrentList, selectLoading } from '../app/musicPackSlice'
-import { selectLoading } from '../app/musicPackSlice'
 import { selectCurrentContainerName } from '../app/uiController'
 
 export default function MusicContainer() {
   // List passed should be a list of musicIDs (see redux store)
   const musicList = useSelector(selectCurrentList)
   const musicListName = useSelector(selectCurrentContainerName)
+  const searchResult = useSelector(selectSearchList)
   const list = searchResult?.length === 0 ? musicList : searchResult
   const [scrollPosition, setScrollPosition] = useState(0)
 
@@ -45,6 +45,8 @@ export default function MusicContainer() {
     overflow: 'scroll',
     overflowX: 'hidden',
     position: 'relative',
+    alignItems: 'flex-start',
+    alignContent: 'flex-start',
   }
 
   const CardRender = list.map((element, key) => (
