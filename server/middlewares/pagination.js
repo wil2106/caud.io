@@ -1,4 +1,4 @@
-const fetchLimitPerPage = 10
+const fetchLimitPerPage = 20
 
 const getPagination = (page, size) => {
   const limit = size ? +size : fetchLimitPerPage
