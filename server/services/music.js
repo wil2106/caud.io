@@ -1,4 +1,5 @@
 const { Music, Notification } = require('../models');
+const {Op, Sequelize} = require('sequelize');
 const sequelize = require('../db');
 
 const add = music => Music.create(music);
@@ -63,7 +64,9 @@ const mostListen = () => Music.findAll({
 
 const searchTitle = search_ => Music.findAll({
     attributes: ['id', 'title'],
-    where: {title: search_}
+    where: {
+        title: {[Op.substring]: search_}
+    }
 });
 
 const fullMusic = id_ => Music.findAll({
