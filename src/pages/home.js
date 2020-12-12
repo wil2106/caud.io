@@ -1,9 +1,9 @@
 import React from 'react'
 import NavBar from '../components/navBar'
 import MusicContainer from './../components/musicContainer'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ContainerSwitcher from './../components/containerSwitcher'
-import { selectSearchList } from '../app/musicPackSlice'
+import { requireContainerList, selectSearchList } from '../app/musicPackSlice'
 import { selectLogin } from '../app/userSlice'
 import SearchBar from '../components/textField'
 import SignUpFormDialog from './../components/signUpFormDialog'
@@ -22,11 +22,17 @@ export default function Home() {
   const userLogin = useSelector(selectLogin)
   const [openSignUpDialog, setOpenSignUpDialog] = React.useState(false)
   const [openLoginDialog, setOpenLoginDialog] = React.useState(false)
+  const dispatch = useDispatch()
 
   const [successSnackBarStatus, setSuccessSnackBarStatus] = React.useState({
     open: false,
     message: '',
   })
+
+  /**
+   * Init
+   */
+  dispatch(requireContainerList('mostRecentIDs', 0))
 
   /**
    * Methods

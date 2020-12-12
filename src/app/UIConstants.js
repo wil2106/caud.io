@@ -25,6 +25,7 @@ export const containers = [
   {
     name: 'Most recent',
     list: 'mostRecentIDs',
+    apiRoute: 'mostRecent',
   },
   {
     name: 'Most liked',
@@ -34,9 +35,11 @@ export const containers = [
   {
     name: 'Most listened',
     list: 'mostListenedIDs',
+    apiRoute: 'mostListen',
   },
   {
     name: 'Most forked',
     list: 'mostForkedIDs',
+    apiRoute: 'mostFork',
   },
 ]
