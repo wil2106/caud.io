@@ -133,15 +133,30 @@ function mostLike(req, res) {
 }
 
 function mostRecent(req, res) {
-  musicService.mostRecent().then(data => res.send(data));
+  const { page, size } = req.query
+  const { limit, offset } = getPagination(page, size)
+  musicService.mostRecent(limit, offset).then((data) => {
+    const response = getPaginationData(data, page, limit)
+    res.send(response)
+  })
 }
 
 function mostFork(req, res) {
-  musicService.mostFork().then(data => res.send(data));
+  const { page, size } = req.query
+  const { limit, offset } = getPagination(page, size)
+  musicService.mostFork(limit, offset).then((data) => {
+    const response = getPaginationData(data, page, limit)
+    res.send(response)
+  })
 }
 
 function mostListen(req, res) {
-  musicService.mostListen().then(data => res.send(data));
+  const { page, size } = req.query
+  const { limit, offset } = getPagination(page, size)
+  musicService.mostListen(limit, offset).then((data) => {
+    const response = getPaginationData(data, page, limit)
+    res.send(response)
+  })
 }
 
 function getFullMusic(req, res) {
