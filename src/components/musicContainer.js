@@ -31,6 +31,10 @@ export default function MusicContainer() {
     }
   }, [scrollPosition])
 
+  useEffect(() => {
+    containerRef.current.scrollTop = 0
+  }, [musicListName])
+
   /**
    * Style
    */

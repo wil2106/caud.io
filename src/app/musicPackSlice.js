@@ -35,7 +35,7 @@ export const musicPackSlice = createSlice({
   reducers: {
     addToList: (state, action) => {
       const { listName, elements } = action.payload
-      elements.forEach((element) => {
+      elements?.forEach((element) => {
         if (!state[listName].includes(element)) {
           state[listName].push(element)
         }
@@ -93,20 +93,15 @@ export const requestNextPage = (listName) => async (dispatch, getState) => {
   dispatch(setLoading({ loading: true }))
 
   // API backend call
-  const result = await retrieveMostList(
-    listName,
-    state.MusicPack[`${listName}Page`]
-  )
-
-  // Dispatch, parse to redux store
-  await dispatch(
-    addToList({
-      listName: containers.find(
-        (element) => element.name === currentActiveContainer
-      ).list,
-      elements: result,
-    })
-  )
+  try {
+    await retrieveAPIMusic(
+      listName,
+      state.MusicPack[`${listName}Page`] + 1,
+      dispatch
+    )
+  } catch (err) {
+    console.log(err)
+  }
 
   // End loading animation
   dispatch(setLoading({ loading: false }))
@@ -135,12 +130,23 @@ export const requireContainerList = (listName) => async (
 ) => {
   const state = getState()
   const page = state.MusicPack[`${listName}Page`]
-  let result
   // Set loading animation
   dispatch(setLoading({ loading: true }))
 
   try {
+    await retrieveAPIMusic(listName, page, dispatch)
+  } catch (err) {
+    console.log(err)
+  }
+  // End loading animation
+  dispatch(setLoading({ loading: false }))
+}
+
+const retrieveAPIMusic = async (listName, page, dispatch) => {
+  let result
+  try {
     result = await retrieveMostList(listName, page)
+    if (!result?.data) return
     const blobedArray = await Promise.all(
       result.data.map(async (element) => {
         if (element.image) {
@@ -157,9 +163,6 @@ export const requireContainerList = (listName) => async (
   } catch (err) {
     console.log(err)
   }
-
-  // End loading animation
-  dispatch(setLoading({ loading: false }))
 }
 
 // Export selectors
