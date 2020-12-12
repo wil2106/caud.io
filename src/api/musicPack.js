@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { containers } from '../app/UIConstants'
 
 export const retrieveRecentMusics = async (page) => {
   let res
@@ -15,11 +16,26 @@ export const retrieveRecentMusics = async (page) => {
 }
 
 export const retrieveMusicObject = async (ids) => {
-  let res
+  let result
   try {
-    res = await axios.get('/', { ids })
+    result = await axios.get(`/api/music/list`, { ids })
   } catch (err) {
     console.log(err)
   }
-  return res.data
+  return result.data
+}
+
+export const retrieveMostList = async (listName, page) => {
+  const apiRoute = containers.find((element) => element.list === listName)
+    .apiRoute
+  let res
+
+  try {
+    res = await axios.get(`/api/music/${apiRoute}?page=${page}`)
+    return res.data
+  } catch (err) {
+    console.log(err)
+  }
+
+  // Format: { data: [], totalPages, currentPage, totalItems }
 }

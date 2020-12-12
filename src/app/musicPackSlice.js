@@ -1,6 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { retrieveMusicObject, retrieveRecentMusics } from '../api/musicPack'
+import {
+  retrieveMostList,
+  retrieveMusicObject,
+  retrieveRecentMusics,
+} from '../api/musicPack'
+import { createBlobURL, imageBufferToBase64 } from '../utils'
 import { containers } from './UIConstants'
+import _ from 'lodash'
 
 /**
  * Default state of Music Pack
@@ -8,24 +14,18 @@ import { containers } from './UIConstants'
  * Should remove value before production commits
  */
 const defaultMusicPack = {
-  musics: [
-    {
-      id: 1,
-      title: 'Example title',
-      image: 'https://upload.wikimedia.org/wikipedia/en/6/60/Aimer_Dawn.jpg',
-      username: 'User',
-      nb_forks: 10,
-      nb_likes: 10,
-      nb_listen: 10,
-      lightMusicObject: null,
-    },
-  ],
-  mostRecentIDs: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  mostLikedIDs: [1, 1, 1, 1, 1, 1, 1, 1],
-  mostListenedIDs: [1, 1, 1],
-  mostForkedIDs: [1, 1],
+  musics: {},
+  mostRecentIDs: [],
+  mostLikedIDs: [],
+  mostListenedIDs: [],
+  mostForkedIDs: [],
   searchResult: [],
   loading: false,
+  mostRecentIDsPage: 0,
+  mostLikedIDsPage: 0,
+  mostListenedIDsPage: 0,
+  mostForkedIDsPage: 0,
+  searchResultPage: 0,
 }
 
 // Create MusicPack redux slice
@@ -35,7 +35,11 @@ export const musicPackSlice = createSlice({
   reducers: {
     addToList: (state, action) => {
       const { listName, elements } = action.payload
-      state[listName].push(...elements)
+      elements?.forEach((element) => {
+        if (!state[listName].includes(element)) {
+          state[listName].push(element)
+        }
+      })
     },
     setLoading: (state, action) => {
       const { loading } = action.payload
@@ -56,6 +60,15 @@ export const musicPackSlice = createSlice({
         }
       })
     },
+    addToMusics: (state, action) => {
+      const temp = {}
+      action.payload.forEach((music) => (temp[music.id] = music))
+      Object.assign(state.musics, temp)
+    },
+    setPages: (state, action) => {
+      const { listName, page } = action.payload
+      state[listName] = page
+    },
   },
 })
 
@@ -65,41 +78,33 @@ export const {
   setLoading,
   clearRecentIDs,
   updateMusicObject,
+  addToMusics,
+  setPages,
 } = musicPackSlice.actions
 
 // Export thunks
-export const requestNextPage = () => async (dispatch, getState) => {
+export const requestNextPage = (listName) => async (dispatch, getState) => {
   const state = getState()
   const { loading } = state.MusicPack
   if (loading) return
+  const currentActiveContainer = state.UIController.currentContainer
+
+  // Set loading animation
   dispatch(setLoading({ loading: true }))
 
   // API backend call
-  console.log('emulate api calls')
-  const result = [1, 1, 1]
-
-  // Dispatch, parse to redux store
-  const currentActiveContainer = state.UIController.currentContainer
-  console.log(currentActiveContainer)
   try {
-    await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(true)
-      }, 3000)
-    })
+    await retrieveAPIMusic(
+      listName,
+      state.MusicPack[`${listName}Page`] + 1,
+      dispatch
+    )
   } catch (err) {
-    console.error(err)
+    console.log(err)
   }
 
-  await dispatch(
-    addToList({
-      listName: containers.find(
-        (element) => element.name === currentActiveContainer
-      ).list,
-      elements: result,
-    })
-  )
-  await dispatch(setLoading({ loading: false }))
+  // End loading animation
+  dispatch(setLoading({ loading: false }))
 }
 
 export const reloadRecentIDs = () => async (dispatch) => {
@@ -117,6 +122,47 @@ export const retrieveLightMusicObjectFromIDs = (ids) => async (dispatch) => {
   // Retrieve object
   const res = await retrieveMusicObject(ids)
   dispatch(updateMusicObject(res))
+}
+
+export const requireContainerList = (listName) => async (
+  dispatch,
+  getState
+) => {
+  const state = getState()
+  const page = state.MusicPack[`${listName}Page`]
+  // Set loading animation
+  dispatch(setLoading({ loading: true }))
+
+  try {
+    await retrieveAPIMusic(listName, page, dispatch)
+  } catch (err) {
+    console.log(err)
+  }
+  // End loading animation
+  dispatch(setLoading({ loading: false }))
+}
+
+const retrieveAPIMusic = async (listName, page, dispatch) => {
+  let result
+  try {
+    result = await retrieveMostList(listName, page)
+    if (!result?.data) return
+    const blobedArray = await Promise.all(
+      result.data.map(async (element) => {
+        if (element.image) {
+          const url = `data:image/png;base64,${element.image}`
+          const blob = await (await fetch(url)).blob()
+          element.image = createBlobURL(blob)
+        }
+        return element
+      })
+    )
+    const ids = result.data.map((element) => element.id)
+    dispatch(addToMusics(blobedArray))
+    dispatch(addToList({ listName, elements: ids }))
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 // Export selectors

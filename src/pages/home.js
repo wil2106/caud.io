@@ -1,13 +1,9 @@
 import React from 'react'
 import NavBar from '../components/navBar'
 import MusicContainer from './../components/musicContainer'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ContainerSwitcher from './../components/containerSwitcher'
-import {
-  selectCurrentList,
-  selectLoading,
-  selectSearchList,
-} from '../app/musicPackSlice'
+import { requireContainerList, selectSearchList } from '../app/musicPackSlice'
 import { selectLogin } from '../app/userSlice'
 import SearchBar from '../components/textField'
 import SignUpFormDialog from './../components/signUpFormDialog'
@@ -18,22 +14,25 @@ import Box from '@material-ui/core/Box'
 import Snackbar from '@material-ui/core/Snackbar'
 import ProfileIndicator from '../components/profileIndicator'
 
-export default function Home(props) {
+export default function Home() {
   /**
    * State
    */
   const searchResult = useSelector(selectSearchList)
-  const musicList = useSelector(selectCurrentList)
   const userLogin = useSelector(selectLogin)
-  const displayList = searchResult?.length === 0 ? musicList : searchResult
-
   const [openSignUpDialog, setOpenSignUpDialog] = React.useState(false)
   const [openLoginDialog, setOpenLoginDialog] = React.useState(false)
+  const dispatch = useDispatch()
 
   const [successSnackBarStatus, setSuccessSnackBarStatus] = React.useState({
     open: false,
     message: '',
   })
+
+  /**
+   * Init
+   */
+  dispatch(requireContainerList('mostRecentIDs', 0))
 
   /**
    * Methods
@@ -111,7 +110,7 @@ export default function Home(props) {
           )}
         </div>
         {searchResult?.length === 0 && <ContainerSwitcher />}
-        <MusicContainer list={displayList} />
+        <MusicContainer />
       </div>
       {openSignUpDialog && (
         <SignUpFormDialog
