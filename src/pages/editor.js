@@ -38,6 +38,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import DeleteIcon from '@material-ui/icons/Delete';
+import TextField from '@material-ui/core/TextField';
 
 
 
@@ -128,7 +129,7 @@ const useStyles = makeStyles((theme) => ({
   },
   input: {
     display: 'none',
-  },
+  }
 }));
 let musicPlayer = new MusicPlayer();
 
@@ -277,11 +278,14 @@ export default function Editor(props) {
                 <Logo/> 
               </IconButton>
           </Link>
-          <Typography variant="h6">Title</Typography>
-          <Box className={classes.title}><IconButton style={{color:'white'}}><EditIcon /></IconButton></Box>
-          <Box m={1}><Button variant="contained" className={classes.greenButton} disableElevation>Share</Button></Box>
-          <Box m={1}><Button variant="contained" className={classes.greyButton} disableElevation>Save</Button></Box>
-          <Box m={1}><Button variant="contained" className={classes.greyButton} disableElevation>Settings</Button></Box>
+          <Box className={classes.title}>
+            <IconButton style={{color:'white'}}/>
+          </Box>
+          <Box m={1}><Button variant="contained" className={classes.greenButton} disableElevation>Create</Button></Box>
+          {/* 
+            <Box m={1}><Button variant="contained" className={classes.greyButton} disableElevation>Save</Button></Box>
+            <Box m={1}><Button variant="contained" className={classes.greyButton} disableElevation>Settings</Button></Box>
+          */}
         </Toolbar>
       </AppBar>
       <Drawer
