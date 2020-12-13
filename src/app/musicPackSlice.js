@@ -3,6 +3,7 @@ import {
   retrieveMostList,
   retrieveMusicObject,
   retrieveRecentMusics,
+  searchMusic,
 } from '../api/musicPack'
 import { createBlobURL, imageBufferToBase64 } from '../utils'
 import { containers } from './UIConstants'
@@ -69,6 +70,14 @@ export const musicPackSlice = createSlice({
       const { listName, page } = action.payload
       state[listName] = page
     },
+    addToSearch: (state, action) => {
+      if (!action.payload?.length) return
+      console.log(action.payload)
+      state.searchResult.push(...action.payload)
+    },
+    resetSearchList: (state) => {
+      state.searchResult = []
+    },
   },
 })
 
@@ -80,6 +89,8 @@ export const {
   updateMusicObject,
   addToMusics,
   setPages,
+  addToSearch,
+  resetSearchList,
 } = musicPackSlice.actions
 
 // Export thunks
@@ -160,6 +171,19 @@ const retrieveAPIMusic = async (listName, page, dispatch) => {
     const ids = result.data.map((element) => element.id)
     dispatch(addToMusics(blobedArray))
     dispatch(addToList({ listName, elements: ids }))
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const searchAPI = (keyword) => async (dispatch) => {
+  try {
+    const res = await searchMusic(keyword)
+    if (!res?.data) return
+    dispatch(addToMusics(res.data[0]))
+
+    const ids = res.data[0].map((element) => element.id)
+    dispatch(addToSearch(ids))
   } catch (err) {
     console.log(err)
   }

@@ -75,11 +75,13 @@ const mostListen = (limit, offset) =>
     type: sequelize.QueryTypes.SELECT,
   })
 
-const searchTitle = search_ => Music.findAll({
-    attributes: ['id', 'title'],
+const searchTitle = (search_, limit, offset) => Music.findAll({
+    attributes: ['id', 'title', 'updatedAt'],
     where: {
-        title: {[Op.substring]: search_}
-    }
+      title: {[Op.substring]: search_}
+    },
+    limit,
+    offset
 });
 
 const fullMusic = id_ => Music.findAll({

@@ -160,8 +160,14 @@ function mostListen(req, res) {
 }
 
 function searchTitle(req, res) {
-  Promise.all([musicService.searchTitle(req.params.search)])
-  .then(data => res.send(data));
+  const { page, size } = req.query
+  const { limit, offset } = getPagination(page, size)
+  Promise.all([
+    musicService.searchTitle(req.params.search, limit, offset),
+  ]).then((data) => {
+    const response = getPaginationData(data, page, limit)
+    res.send(response)
+  })
 }
 
 function getFullMusic(req, res) {

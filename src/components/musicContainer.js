@@ -65,6 +65,9 @@ export default function MusicContainer() {
 
   return useMemo(() => (
     <React.Fragment>
+      {searchResult?.length && (
+        <h1 style={{ color: 'white' }}>Search Result:</h1>
+      )}
       <div style={container} onScroll={onScroll} ref={containerRef}>
         {list.length ? CardRender : <EmptyContainer />}
         <Box display="flex" justifyContent="center" width={1} m={2}>

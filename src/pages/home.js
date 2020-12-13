@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import NavBar from '../components/navBar'
 import MusicContainer from './../components/musicContainer'
 import { useDispatch, useSelector } from 'react-redux'
 import ContainerSwitcher from './../components/containerSwitcher'
 import { requireContainerList, selectSearchList } from '../app/musicPackSlice'
 import { selectLogin } from '../app/userSlice'
-import SearchBar from '../components/textField'
+import SearchBar from '../components/SearchBar'
 import SignUpFormDialog from './../components/signUpFormDialog'
 import LoginFormDialog from './../components/loginFormDialog'
 import GreenButton from './../components/greenButton'
@@ -93,7 +93,7 @@ export default function Home() {
       <div style={panel}>
         <div style={topBar}>
           <Box flexGrow={1}>
-            <SearchBar placeholder="Search..." />
+            <SearchBar />
           </Box>
           {/*<Box flexGrow={1}><SearchBar placeHolder="Search"/></Box>*/}
           {userLogin ? (

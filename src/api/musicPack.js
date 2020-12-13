@@ -39,3 +39,12 @@ export const retrieveMostList = async (listName, page) => {
 
   // Format: { data: [], totalPages, currentPage, totalItems }
 }
+
+export const searchMusic = async (keyword) => {
+  try {
+    const res = await axios.get(`/api/music/searchTitle/${keyword}`)
+    return res.data
+  } catch (err) {
+    console.log(err)
+  }
+}
