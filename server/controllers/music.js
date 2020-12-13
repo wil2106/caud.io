@@ -216,31 +216,45 @@ function getMusicContent(req, res) {
   });
 }
 
-function getListOfMusic(req, res) {
+async function getListOfMusic(req, res) {
   listMusic = []
   if(req.body.ids.length == 0) { return res.status(404).send("no id provided") }
-  Promise.all(req.body.ids.map( id => {
-    musicService.fullMusic(id)
-    .then(music => {
-      if(music.length == 0) {
-        return res.status(404).send("one of the musics is either non-existent or private")
-      }
-      if(music[0].dataValues.fk_author == null) {
-        return res.status(404).send("author of one of the music is not specified")
-      }
-      userService.getUserLoginById(music[0].dataValues.fk_author)
-      .then(login => {
-        music[0].dataValues.authorLogin = login.login
-        listMusic.push(music[0])
-        if( listMusic.length == req.body.ids.length ) {
-          return res.send(listMusic)
-        } 
-      })
-      .catch(error => res.send(error));
+  // Promise.all(req.body.ids.map( id => {
+  //   musicService.fullMusic(id)
+  //   .then(music => {
+  //     if(music.length == 0) {
+  //       return res.status(404).send("one of the musics is either non-existent or private")
+  //     }
+  //     if(music[0].dataValues.fk_author == null) {
+  //       return res.status(404).send("author of one of the music is not specified")
+  //     }
+  //     userService.getUserLoginById(music[0].dataValues.fk_author)
+  //     .then(login => {
+  //       music[0].dataValues.authorLogin = login.login
+  //       listMusic.push(music[0])
+  //       if( listMusic.length == req.body.ids.length ) {
+  //         return res.send(listMusic)
+  //       } 
+  //     })
+  //     .catch(error => res.send(error));
+  //   })
+  //   .catch(error => res.send(error));
+  // }))
+  // .catch(error => res.send(error));
+
+  try {
+    const data = await Promise.all(req.body.ids.map(async (id) => {
+      const musicData = await musicService.fullMusic(id)
+      if (!musicData || !musicData.length) return
+      return musicData[0]
+    }))
+    if (!data || !data.length) res.status(409).send({ message: 'Nothing found' })
+    return res.status(200).send({
+      data: data
     })
-    .catch(error => res.send(error));
-  }))
-  .catch(error => res.send(error));
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 

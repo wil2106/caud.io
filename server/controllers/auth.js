@@ -10,10 +10,10 @@ function login(req, res, next){
      const { login, password } = req.body
      if (!req.body || !login || !password) return next(new BadRequest('Incomplete credentials.'))
     return authService.authenticate(req.body)
-    .then(token => {
+    .then(({token, id}) => {
          res.send({
               success: true,
-              data: { token }
+              data: { token, id }
          });
     })
     .catch(err => {

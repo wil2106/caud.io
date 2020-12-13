@@ -25,7 +25,7 @@ const authenticate = params => {
       let token = jwt.sign(payload, config.jwtSecret, {
         expiresIn: config.tokenExpireTime,
       })
-      return token
+      return { token, id: user.id }
     })
 }
 

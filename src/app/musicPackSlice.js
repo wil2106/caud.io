@@ -3,11 +3,13 @@ import {
   retrieveMostList,
   retrieveMusicObject,
   retrieveRecentMusics,
+  retrieveUserMusic,
   searchMusic,
 } from '../api/musicPack'
 import { createBlobURL, imageBufferToBase64 } from '../utils'
 import { containers } from './UIConstants'
 import _ from 'lodash'
+import { setMusicIDs } from './userSlice'
 
 /**
  * Default state of Music Pack
@@ -135,6 +137,22 @@ export const retrieveLightMusicObjectFromIDs = (ids) => async (dispatch) => {
   dispatch(updateMusicObject(res))
 }
 
+export const retrieveMusics = (ids) => async (dispatch) => {
+  const result = await retrieveLightMusicObjectFromIDs(ids)
+  if (!result?.data) return
+  const blobedArray = await Promise.all(
+    result.data.map(async (element) => {
+      if (element.image) {
+        const url = `data:image/png;base64,${element.image}`
+        const blob = await (await fetch(url)).blob()
+        element.image = createBlobURL(blob)
+      }
+      return element
+    })
+  )
+  dispatch(addToMusics(blobedArray))
+}
+
 export const requireContainerList = (listName) => async (
   dispatch,
   getState
@@ -184,6 +202,18 @@ export const searchAPI = (keyword) => async (dispatch) => {
 
     const ids = res.data[0].map((element) => element.id)
     dispatch(addToSearch(ids))
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const getUserMusics = (id) => async (dispatch, getState) => {
+  const state = getState()
+  if (state.User?.token) return
+
+  try {
+    const res = await retrieveUserMusic(id, state.User.token)
+    dispatch(setMusicIDs(res.data))
   } catch (err) {
     console.log(err)
   }
