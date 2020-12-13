@@ -23,17 +23,62 @@ const defaultMusicPack = {
   mostListenedIDs: [1, 1, 1],
   mostForkedIDs: [1, 1],
   searchResult: [],
+  loading: false,
 }
 
 // Create MusicPack redux slice
 export const musicPackSlice = createSlice({
   name: 'MusicPack',
   initialState: defaultMusicPack,
-  reducers: {},
+  reducers: {
+    addToList: (state, action) => {
+      const { listName, elements } = action.payload
+      state[listName].push(...elements)
+    },
+    setLoading: (state, action) => {
+      const { loading } = action.payload
+      state.loading = loading
+    },
+  },
 })
 
 // Export Actions
-export const {} = musicPackSlice.actions
+export const { addToList, setLoading } = musicPackSlice.actions
+
+// Export thunks
+export const requestNextPage = () => async (dispatch, getState) => {
+  const state = getState()
+  const { loading } = state.MusicPack
+  if (loading) return
+  dispatch(setLoading({ loading: true }))
+
+  // API backend call
+  console.log('emulate api calls')
+  const result = [1, 1, 1]
+
+  // Dispatch, parse to redux store
+  const currentActiveContainer = state.UIController.currentContainer
+  console.log(currentActiveContainer)
+  try {
+    await new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(true)
+      }, 3000)
+    })
+  } catch (err) {
+    console.error(err)
+  }
+
+  await dispatch(
+    addToList({
+      listName: containers.find(
+        (element) => element.name === currentActiveContainer
+      ).list,
+      elements: result,
+    })
+  )
+  await dispatch(setLoading({ loading: false }))
+}
 
 // Export selectors
 export const selectMusics = (state) => state.MusicPack.musics
@@ -43,6 +88,7 @@ export const selectCurrentList = (state) => {
   return state.MusicPack[target.list]
 }
 export const selectSearchList = (state) => state.MusicPack.searchResult
+export const selectLoading = (state) => state.MusicPack.loading
 
 // Export default reducers
 export default musicPackSlice.reducer

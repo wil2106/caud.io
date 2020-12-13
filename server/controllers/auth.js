@@ -14,7 +14,7 @@ function login(req, res){
          });
     })
     .catch(err => {
-         res.send({
+         res.status(401).send({
               success: false,
               message: err.message 
          });
@@ -25,9 +25,9 @@ function register(req, res){
     return userService.getUserByLogin(req.body.login || '')
     .then(exists => {
          if (exists){
-              return res.send({
+              return res.status(409).send({
                   success: false,
-                  message: 'Registration failed. User with this email already registered.'
+                  message: 'Registration failed. User with this login already registered.'
               });
          }
          let user = {
