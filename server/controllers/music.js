@@ -159,6 +159,17 @@ function mostListen(req, res) {
   })
 }
 
+function searchTitle(req, res) {
+  const { page, size } = req.query
+  const { limit, offset } = getPagination(page, size)
+  Promise.all([
+    musicService.searchTitle(req.params.search, limit, offset),
+  ]).then((data) => {
+    const response = getPaginationData(data, page, limit)
+    res.send(response)
+  })
+}
+
 function getFullMusic(req, res) {
   let fullMusic = {
     music: null,
@@ -243,6 +254,7 @@ module.exports = {
     mostRecent,
     mostFork,
     mostListen,
+    searchTitle,
     getFullMusic,
     getMusicContent,
     deleteMusic,
