@@ -159,6 +159,11 @@ function mostListen(req, res) {
   })
 }
 
+function searchTitle(req, res) {
+  Promise.all([musicService.searchTitle(req.params.search)])
+  .then(data => res.send(data));
+}
+
 function getFullMusic(req, res) {
   let fullMusic = {
     music: null,
@@ -243,6 +248,7 @@ module.exports = {
     mostRecent,
     mostFork,
     mostListen,
+    searchTitle,
     getFullMusic,
     getMusicContent,
     deleteMusic,

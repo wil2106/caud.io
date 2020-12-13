@@ -1,4 +1,5 @@
 const { Music, Notification } = require('../models');
+const {Op, Sequelize} = require('sequelize');
 const sequelize = require('../db');
 
 const baseQuery = (orderBy) =>
@@ -74,6 +75,13 @@ const mostListen = (limit, offset) =>
     type: sequelize.QueryTypes.SELECT,
   })
 
+const searchTitle = search_ => Music.findAll({
+    attributes: ['id', 'title'],
+    where: {
+        title: {[Op.substring]: search_}
+    }
+});
+
 const fullMusic = id_ => Music.findAll({
     where: {
         id: id_,
@@ -89,4 +97,4 @@ const musicContent = id_ => Music.findAll({
     }
 })
 
-module.exports = {like, notify, add, updateMusic, deleteMusic, listen, fork, mostLike, mostRecent, mostFork, mostListen, fullMusic, musicContent};
+module.exports = {like, notify, add, updateMusic, deleteMusic, listen, fork, mostLike, mostRecent, mostFork, mostListen, searchTitle, fullMusic, musicContent};

@@ -12,11 +12,12 @@ router.post('/music/listen',authMiddleware.checkAuth , musicController.listen)
 
 router.get('/music/list', musicController.getListOfMusic)
 router.get('/music/full/:id', musicController.getFullMusic)
-router.get('/music/content/:id', musicController.getMusicContent)
 router.get('/music/mostLike', musicController.mostLike)
 router.get('/music/mostRecent', musicController.mostRecent)
 router.get('/music/mostFork', musicController.mostFork)
+router.get('/music/content/:id', musicController.getMusicContent)
 router.get('/music/mostListen', musicController.mostListen)
+router.get('/music/searchTitle/:search',authMiddleware.checkAuth , musicController.searchTitle)
 
 router.delete('/music/delete/:id', authMiddleware.checkAuth, musicController.deleteMusic)
 
