@@ -47,7 +47,7 @@ export default function NavBar(props) {
       <Logo height={LOGO_SIZE} width="auto" style={logoStyle} />
       <>
         {pages.map((element, key) => (
-          <NavItem page={element} key={key} />
+          <NavItem  page={element} key={key} />
         ))}
       </>
       

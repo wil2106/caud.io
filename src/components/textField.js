@@ -19,19 +19,27 @@ const styles = theme => ({
 
 
 function GreyTextField(props) {
-  const { classes, placeholder, onChange, isPassword, disabled } = props
+  const {
+    classes,
+    placeholder,
+    onChange,
+    isPassword,
+    disabled,
+    ...rest
+  } = props
 
   return (
-    <Box m={1}>
+    <Box m={1} style={{    flexGrow: 1    }}>
       <InputBase
-          className={classes.textField}
-          placeholder={placeholder}
-          onChange={onChange}
-          type={isPassword ? "password" : "text"}
-          disabled={disabled}
+        className={classes.textField}
+        placeholder={placeholder}
+        onChange={onChange}
+        type={isPassword ? 'password' : 'text'}
+        disabled={disabled}
+        {...rest}
       />
     </Box>
-  );
+  )
 }
 
 

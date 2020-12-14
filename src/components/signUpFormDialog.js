@@ -93,7 +93,7 @@ function FormDialog(props) {
       <DialogContent>
         <Box display="flex" alignItems="center">
           <Box><PersonIcon style={{ color: 'white' }}/></Box>
-          <Box flexGrow={1}><TextField disable onChange = {handleLoginChange} placeholder="login" disabled={loading}/></Box>
+          <Box flexGrow={1}><TextField onChange = {handleLoginChange} placeholder="login" disabled={loading}/></Box>
         </Box>
         <Box display="flex" alignItems="center">
           <Box><LockIcon style={{ color: 'white' }}/></Box>

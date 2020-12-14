@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { requireContainerList } from '../app/musicPackSlice'
 import {
   containerNavigate,
   selectCurrentContainer,
@@ -13,7 +14,7 @@ const COLOR_INACTIVE = '#717790'
 const BACKGROUND_HOVER = '#272a33'
 
 export default function ContainerLabel(props) {
-  const { title } = props
+  const { list } = props
 
   /**
    * State
@@ -21,7 +22,7 @@ export default function ContainerLabel(props) {
   const [hover, setHover] = useState(false)
   const currentContainer = useSelector(selectCurrentContainer)
   const dispatch = useDispatch()
-  const selected = title === currentContainer
+  const selected = list.name === currentContainer
 
   /**
    * Styles
@@ -58,7 +59,8 @@ export default function ContainerLabel(props) {
    */
   const onClick = !selected
     ? () => {
-        dispatch(containerNavigate({ name: title }))
+        dispatch(containerNavigate({ name: list.name }))
+        dispatch(requireContainerList(list.list))
         setHover(false)
       }
     : null
@@ -72,7 +74,9 @@ export default function ContainerLabel(props) {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <h1 style={titleStyle}>{title}</h1>
+      <h1 style={titleStyle} className="noSelect">
+        {list.name}
+      </h1>
       {selected && <div style={flagStyle} />}
     </div>
   )

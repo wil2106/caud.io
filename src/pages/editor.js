@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-
+import { useDispatch, useSelector } from 'react-redux'
 import {Link} from "react-router-dom";
 
 import AceEditor from "react-ace";
@@ -38,9 +38,19 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import DeleteIcon from '@material-ui/icons/Delete';
-import TextField from '@material-ui/core/TextField';
 
+import GreenButton from './../components/greenButton'
+import GreyButton from './../components/greyButton'
 
+import NewMusicDialog from '../components/newMusicFormDialog'
+import SignUpFormDialog from './../components/signUpFormDialog'
+import LoginFormDialog from './../components/loginFormDialog'
+
+import Snackbar from '@material-ui/core/Snackbar'
+
+import ProfileIndicator from '../components/profileIndicator'
+
+import { selectLogin } from '../app/userSlice'
 
 import "ace-builds/src-noconflict/mode-ruby";
 import "ace-builds/src-noconflict/theme-monokai";
@@ -158,6 +168,19 @@ export default function Editor(props) {
 
   const [selectedSample, setSelectedSample] = useState();
 
+  const [openNewMusicDialog, setOpenNewMusicDialog] = React.useState(false)
+
+  const [openSignUpDialog, setOpenSignUpDialog] = React.useState(false)
+  const [openLoginDialog, setOpenLoginDialog] = React.useState(false)
+
+  const [successSnackBarStatus, setSuccessSnackBarStatus] = React.useState({
+    open: false,
+    message: '',
+  })
+
+
+  const userLogin = useSelector(selectLogin)
+
   useEffect(() => {
     if(!musicPlayer.isAudioContextStarted()){
       setOpenAudioContextDialog(true)
@@ -268,6 +291,38 @@ export default function Editor(props) {
     setSelectedSample(samples[index]);
   }
 
+  const handleCloseNewMusicDialog = () => {
+    setOpenNewMusicDialog(false)
+  }
+
+  const handleOpenNewMusicDialog = () => {
+    setOpenNewMusicDialog(true)
+  }
+
+  const handleCloseSignUpDialog = () => {
+    setOpenSignUpDialog(false)
+  }
+
+  const handleOpenSignUpDialog = () => {
+    setOpenSignUpDialog(true)
+  }
+
+  const handleCloseLoginDialog = () => {
+    setOpenLoginDialog(false)
+  }
+
+  const handleOpenLoginDialog = () => {
+    setOpenLoginDialog(true)
+  }
+
+  const handleOpenSuccessSnackBar = (message) => {
+    setSuccessSnackBarStatus({ open: true, message: message })
+  }
+
+  const handleCloseSuccessSnackBar = () => {
+    setSuccessSnackBarStatus({ open: false, message: '' })
+  }
+
 
   return (
     <div className={classes.root}>
@@ -281,11 +336,22 @@ export default function Editor(props) {
           <Box className={classes.title}>
             <IconButton style={{color:'white'}}/>
           </Box>
-          <Box m={1}><Button variant="contained" className={classes.greenButton} disableElevation>Create</Button></Box>
-          {/* 
-            <Box m={1}><Button variant="contained" className={classes.greyButton} disableElevation>Save</Button></Box>
-            <Box m={1}><Button variant="contained" className={classes.greyButton} disableElevation>Settings</Button></Box>
-          */}
+          {userLogin ? (
+            <Box display="flex" alignItems="center">
+              <GreenButton onClick={handleOpenNewMusicDialog} text="CREATE" />
+              <GreyButton onClick={null} text="SHARE" />
+              <ProfileIndicator />
+            </Box>
+          ) : (
+            <Box display="flex">
+              <Box>
+                <GreenButton onClick={handleOpenLoginDialog} text="LOGIN" />
+              </Box>
+              <Box>
+                <GreyButton onClick={handleOpenSignUpDialog} text="SIGN UP" />
+              </Box>
+            </Box>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -438,6 +504,34 @@ export default function Editor(props) {
           </DialogActions>
         </Dialog>
       </div>
+      {openNewMusicDialog && (
+        <NewMusicDialog
+          closeDialog={handleCloseNewMusicDialog}
+          setupCode={setupCode}
+          stepCode={stepCode}
+          bpm={bpm}
+          nbSteps={nbSteps}
+          samples={samples}
+        />
+      )}
+      {openSignUpDialog && (
+        <SignUpFormDialog
+          closeDialog={handleCloseSignUpDialog}
+          openSuccessSnackBar={handleOpenSuccessSnackBar}
+        />
+      )}
+      {openLoginDialog && (
+        <LoginFormDialog
+          closeDialog={handleCloseLoginDialog}
+          openSuccessSnackBar={handleOpenSuccessSnackBar}
+        />
+      )}
+      <Snackbar
+        open={successSnackBarStatus.open}
+        onClose={handleCloseSuccessSnackBar}
+        message={successSnackBarStatus.message}
+        autoHideDuration={4000}
+      />
     </div>
   )
 }

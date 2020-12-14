@@ -1,44 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
 import NavBar from '../components/navBar'
 import MusicContainer from './../components/musicContainer'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ContainerSwitcher from './../components/containerSwitcher'
-import {
-  selectCurrentList,
-  selectLoading,
-  selectSearchList,
-} from '../app/musicPackSlice'
-import {
-  selectLogin
-} from '../app/userSlice'
-import SearchBar from '../components/textField'
+import { requireContainerList, selectSearchList } from '../app/musicPackSlice'
+import { selectLogin } from '../app/userSlice'
+import SearchBar from '../components/SearchBar'
 import SignUpFormDialog from './../components/signUpFormDialog'
 import LoginFormDialog from './../components/loginFormDialog'
 import GreenButton from './../components/greenButton'
 import GreyButton from './../components/greyButton'
-import Box from '@material-ui/core/Box';
-import Snackbar from '@material-ui/core/Snackbar';
+import Box from '@material-ui/core/Box'
+import Snackbar from '@material-ui/core/Snackbar'
+import ProfileIndicator from '../components/profileIndicator'
 
-
-
-export default function Home(props) {
+export default function Home() {
   /**
    * State
    */
   const searchResult = useSelector(selectSearchList)
-  const musicList = useSelector(selectCurrentList)
   const userLogin = useSelector(selectLogin)
-  const displayList = searchResult?.length === 0 ? musicList : searchResult
+  const [openSignUpDialog, setOpenSignUpDialog] = React.useState(false)
+  const [openLoginDialog, setOpenLoginDialog] = React.useState(false)
+  const dispatch = useDispatch()
 
-  const [openSignUpDialog, setOpenSignUpDialog] = React.useState(false);
-  const [openLoginDialog, setOpenLoginDialog] = React.useState(false);
+  const [successSnackBarStatus, setSuccessSnackBarStatus] = React.useState({
+    open: false,
+    message: '',
+  })
 
-  const [successSnackBarStatus, setSuccessSnackBarStatus] = React.useState({open: false, message: ''});
-
+  /**
+   * Init
+   */
+  dispatch(requireContainerList('mostRecentIDs', 0))
 
   /**
    * Methods
-  */
+   */
 
   const handleCloseSignUpDialog = () => {
     setOpenSignUpDialog(false)
@@ -57,12 +55,12 @@ export default function Home(props) {
   }
 
   const handleOpenSuccessSnackBar = (message) => {
-    setSuccessSnackBarStatus({open: true, message: message});
-  };
+    setSuccessSnackBarStatus({ open: true, message: message })
+  }
 
   const handleCloseSuccessSnackBar = () => {
-    setSuccessSnackBarStatus({open: false, message: ''});
-  };
+    setSuccessSnackBarStatus({ open: false, message: '' })
+  }
 
   /**
    * Style
@@ -94,30 +92,38 @@ export default function Home(props) {
       <NavBar />
       <div style={panel}>
         <div style={topBar}>
-            <Box flexGrow={1}><SearchBar placeholder="Search..."/></Box>
-            {/*<Box flexGrow={1}><SearchBar placeHolder="Search"/></Box>*/}
-            {
-              !userLogin && 
-              <React.Fragment>
-                <Box><GreenButton onClick={handleOpenLoginDialog} text="LOGIN"/></Box>
-                <Box><GreyButton onClick={handleOpenSignUpDialog} text="SIGN UP"/></Box>
-              </React.Fragment>
-            }
-            
+          <Box flexGrow={1}>
+            <SearchBar />
+          </Box>
+          {/*<Box flexGrow={1}><SearchBar placeHolder="Search"/></Box>*/}
+          {userLogin ? (
+            <ProfileIndicator />
+          ) : (
+            <React.Fragment>
+              <Box>
+                <GreenButton onClick={handleOpenLoginDialog} text="LOGIN" />
+              </Box>
+              <Box>
+                <GreyButton onClick={handleOpenSignUpDialog} text="SIGN UP" />
+              </Box>
+            </React.Fragment>
+          )}
         </div>
         {searchResult?.length === 0 && <ContainerSwitcher />}
-        <MusicContainer list={displayList} />
+        <MusicContainer />
       </div>
-      {openSignUpDialog && 
-       <SignUpFormDialog closeDialog={handleCloseSignUpDialog} 
+      {openSignUpDialog && (
+        <SignUpFormDialog
+          closeDialog={handleCloseSignUpDialog}
           openSuccessSnackBar={handleOpenSuccessSnackBar}
         />
-      }
-      {openLoginDialog && 
-        <LoginFormDialog closeDialog={handleCloseLoginDialog} 
+      )}
+      {openLoginDialog && (
+        <LoginFormDialog
+          closeDialog={handleCloseLoginDialog}
           openSuccessSnackBar={handleOpenSuccessSnackBar}
         />
-      }
+      )}
       <Snackbar
         open={successSnackBarStatus.open}
         onClose={handleCloseSuccessSnackBar}

@@ -32,6 +32,10 @@ export const { navigate, containerNavigate } = UISlicer.actions
 export const selectCurrent = (state) => state.UIController.current
 export const selectCurrentContainer = (state) =>
   state.UIController.currentContainer
+export const selectCurrentContainerName = (state) =>
+  containers.find(
+    (element) => element.name === state.UIController.currentContainer
+  )?.list
 
 // Export default reducers
 export default UISlicer.reducer
