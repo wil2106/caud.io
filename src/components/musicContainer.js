@@ -10,9 +10,10 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { selectCurrentList, selectLoading } from '../app/musicPackSlice'
 import { selectCurrentContainerName } from '../app/uiController'
 
-export default function MusicContainer() {
+export default function MusicContainer(props) {
+  const { listCustom } = props
   // List passed should be a list of musicIDs (see redux store)
-  const musicList = useSelector(selectCurrentList)
+  const musicList = useSelector(selectCurrentList) ?? listCustom
   const musicListName = useSelector(selectCurrentContainerName)
   const searchResult = useSelector(selectSearchList)
   const list = searchResult?.length === 0 ? musicList : searchResult
