@@ -32,22 +32,37 @@ function getUserMusicIDs(req, res) {
     .catch((err) => res.status(400).send('Internal error'))
 }
 
+/**
+ * Supprime un utilisateur
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
 function deleteUser(req, res) {
     userService.getUserByLogin(req.body.login)
     .then(result => {
         userService.deleteUser(result.id)
     })
-    .then(data => res.send(data));
+    .then(data => res.send(data))
+    .catch(err => next(new GeneralError('Internal Error')));
 }
-  
-  function updateUser(req, res) {
+ 
+/**
+ * Met à jour les donées d'un utilisateur
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+  function updateUser(req, res, next) {
     let user = {
       login: req.body.login,
       password: req.body.password,
       description: req.body.description,
       
     }
-    userService.updateUser(user, req.params.id).then(data => res.send(data));
+    userService.updateUser(user, req.params.id)
+    .then(data => res.send(data))
+    .catch(err => next(new GeneralError('Internal Error')));
   
     
   }
