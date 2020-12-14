@@ -6,6 +6,12 @@ const authService = require('../services/auth');
 const userService = require('../services/user');
 const { GeneralError, BadRequest } = require('../middlewares/errorClass');
 
+/**
+ * connecte un utilisateur
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
 function login(req, res, next){
      const { login, password } = req.body
      if (!req.body || !login || !password) return next(new BadRequest('Incomplete credentials.'))
@@ -24,6 +30,12 @@ function login(req, res, next){
     })
 };
 
+/**
+ * crée un compte utilisateur
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
 function register(req, res, next){
      const { login, password } = req.body
      if (!req.body || !login || !password ) return next(new BadRequest('Incomplete credentials.'))
