@@ -1,7 +1,7 @@
-const Router =  require('express').Router
-const authRouter = require('./auth.js') 
-const sampleRouter = require('./sample.js') 
-const musicRouter = require('./music.js') 
+const Router = require('express').Router
+const authRouter = require('./auth.js')
+const sampleRouter = require('./sample.js')
+const musicRouter = require('./music.js')
 const libraryRouter = require('./library.js')
 const userRouter = require('./user')
 
@@ -11,6 +11,6 @@ router.use('/', sampleRouter)
 router.use('/', musicRouter)
 router.use('/', libraryRouter)
 router.use('/', userRouter)
-router.use('/test', (req, res)=> res.send('hello world'))
+router.use('/test', (req, res) => res.send('hello world'))
 
 module.exports = router

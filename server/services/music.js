@@ -1,6 +1,6 @@
-const { Music, Notification } = require('../models');
-const {Op, Sequelize} = require('sequelize');
-const sequelize = require('../db');
+const { Music, Notification } = require('../models')
+const { Op, Sequelize } = require('sequelize')
+const sequelize = require('../db')
 
 const baseQuery = (orderBy) =>
   `SELECT music.id, music.title, music.nb_forks,
@@ -12,32 +12,44 @@ const baseQuery = (orderBy) =>
     OFFSET $offset
     LIMIT $limit`
 
-const add = music => Music.create(music);
+const add = (music) => Music.create(music)
 
-const deleteMusic = id_ => Music.destroy({ 
-    where: { id: id_ }
-});
+const deleteMusic = (id_) =>
+  Music.destroy({
+    where: { id: id_ },
+  })
 
-const updateMusic = (music, id_) => Music.update( 
-    music,
-    {where: {id: id_}}
-);
+const updateMusic = (music, id_) => Music.update(music, { where: { id: id_ } })
 
-const like = (id_) => Music.update({ 
-    nb_likes: sequelize.literal('nb_likes + 1')}, {
-    where: {id: id_}
-});
+const like = (id_) =>
+  Music.update(
+    {
+      nb_likes: sequelize.literal('nb_likes + 1'),
+    },
+    {
+      where: { id: id_ },
+    }
+  )
 
-const fork = (id_) => Music.update({ 
-    nb_forks: sequelize.literal('nb_forks + 1')}, {
-    where: {id: id_}
-});
+const fork = (id_) =>
+  Music.update(
+    {
+      nb_forks: sequelize.literal('nb_forks + 1'),
+    },
+    {
+      where: { id: id_ },
+    }
+  )
 
-const notify = notification => Notification.create(notification);
+const notify = (notification) => Notification.create(notification)
 
-const listen = id_ => Music.update({ nb_listen: sequelize.literal('nb_listen + 1')}, {
-    where: {id: id_}
-});
+const listen = (id_) =>
+  Music.update(
+    { nb_listen: sequelize.literal('nb_listen + 1') },
+    {
+      where: { id: id_ },
+    }
+  )
 
 const mostLike = (limit, offset) =>
   sequelize.query(baseQuery('nb_likes DESC'), {
@@ -75,14 +87,15 @@ const mostListen = (limit, offset) =>
     type: sequelize.QueryTypes.SELECT,
   })
 
-const searchTitle = (search_, limit, offset) => Music.findAll({
+const searchTitle = (search_, limit, offset) =>
+  Music.findAll({
     attributes: ['id', 'title', 'updatedAt'],
     where: {
-      title: {[Op.substring]: search_}
+      title: { [Op.substring]: search_ },
     },
     limit,
-    offset
-});
+    offset,
+  })
 
 const fullMusic = (id_) =>
   sequelize.query(
@@ -94,12 +107,28 @@ const fullMusic = (id_) =>
     { bind: { id: id_ }, type: sequelize.QueryTypes.SELECT }
   )
 
-const musicContent = id_ => Music.findAll({
-    attributes: ["setup_code", "step_code"],
+const musicContent = (id_) =>
+  Music.findAll({
+    attributes: ['setup_code', 'step_code'],
     where: {
-        id: id_,
-        private: false
-    }
-})
+      id: id_,
+      private: false,
+    },
+  })
 
-module.exports = {like, notify, add, updateMusic, deleteMusic, listen, fork, mostLike, mostRecent, mostFork, mostListen, searchTitle, fullMusic, musicContent};
+module.exports = {
+  like,
+  notify,
+  add,
+  updateMusic,
+  deleteMusic,
+  listen,
+  fork,
+  mostLike,
+  mostRecent,
+  mostFork,
+  mostListen,
+  searchTitle,
+  fullMusic,
+  musicContent,
+}

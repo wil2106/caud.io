@@ -2,7 +2,6 @@ const Router = require('express').Router
 const authMiddleware = require('../middlewares/auth')
 const userController = require('../controllers/user')
 
-
 const router = Router()
 router.get('/user/:id', authMiddleware.checkAuth, userController.getUser)
 router.get(
@@ -10,7 +9,15 @@ router.get(
   authMiddleware.checkAuth,
   userController.getUserMusicIDs
 )
-router.delete('/user/delete/:id', authMiddleware.checkAuth, userController.deleteUser)
-router.put('/user/update/:id',authMiddleware.checkAuth , userController.updateUser)
+router.delete(
+  '/user/delete/:id',
+  authMiddleware.checkAuth,
+  userController.deleteUser
+)
+router.put(
+  '/user/update/:id',
+  authMiddleware.checkAuth,
+  userController.updateUser
+)
 
 module.exports = router

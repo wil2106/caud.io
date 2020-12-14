@@ -1,3 +1,7 @@
+/**
+ * @class GeneralError
+ * @description Custom error class used to handle backend error responses
+ */
 class GeneralError extends Error {
   constructor(message) {
     super()
@@ -19,9 +23,21 @@ class GeneralError extends Error {
   }
 }
 
+/**
+ * @class BadRequest
+ * @description Abstract class for bad requests
+ */
 class BadRequest extends GeneralError {}
+
+/**
+ * @class NotFound
+ * @description Abstract class for data not found
+ */
 class NotFound extends GeneralError {}
 
+/**
+ * @exports
+ */
 module.exports = {
   GeneralError,
   BadRequest,

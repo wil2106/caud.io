@@ -1,12 +1,18 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../db');
 
+/**
+ * User sequelize model
+ */
 const User = sequelize.define('user', {
     login: Sequelize.STRING,
     password: Sequelize.STRING,
     description: Sequelize.STRING
 });
 
+/**
+ * Music sequelize model
+ */
 const Music = sequelize.define('music', {
     title: Sequelize.STRING,
     nb_likes: Sequelize.INTEGER,
@@ -19,7 +25,9 @@ const Music = sequelize.define('music', {
     image: Sequelize.BLOB
 });
 
-
+/**
+ * Sample sequelize model
+ */
 const Sample = sequelize.define('sample', {
     title: Sequelize.STRING,
     file: Sequelize.BLOB
@@ -46,6 +54,9 @@ sequelize.sync({ force: false })
     console.log(`Database & tables created!`)
 })
 
+/**
+ * @exports
+ */
 module.exports = {
     User, Music, Library, Sample, Notification
 }

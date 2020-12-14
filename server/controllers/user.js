@@ -1,9 +1,15 @@
-const userService = require('../services/user');
+const userService = require('../services/user')
 const {
   getPagination,
   getPaginationData,
 } = require('./../middlewares/pagination')
 
+/**
+ * @function getUser
+ * @description retrieve user from database
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 function getUser(req, res) {
   userService.getUserByID(req.params.id).then((result) => {
     // TODO: Check user token matching
@@ -18,6 +24,12 @@ function getUser(req, res) {
   })
 }
 
+/**
+ * @function getUserMusicIDs
+ * @description get user's music library
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 function getUserMusicIDs(req, res) {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
@@ -33,41 +45,44 @@ function getUserMusicIDs(req, res) {
 }
 
 /**
- * Supprime un utilisateur
+ * @function deleteUser
+ * @description Supprime un utilisateur
  * @param { import('express').Request } req
  * @param { import('express').Response } res
  * @param { function } next
  */
 function deleteUser(req, res) {
-    userService.getUserByLogin(req.body.login)
-    .then(result => {
-        userService.deleteUser(result.id)
+  userService
+    .getUserByLogin(req.body.login)
+    .then((result) => {
+      userService.deleteUser(result.id)
     })
-    .then(data => res.send(data))
-    .catch(err => next(new GeneralError('Internal Error')));
+    .then((data) => res.send(data))
+    .catch((err) => next(new GeneralError('Internal Error')))
 }
- 
+
 /**
- * Met à jour les donées d'un utilisateur
+ * @function updateUser
+ * @description Met à jour les donées d'un utilisateur
  * @param { import('express').Request } req
  * @param { import('express').Response } res
  * @param { function } next
  */
-  function updateUser(req, res, next) {
-    let user = {
-      login: req.body.login,
-      password: req.body.password,
-      description: req.body.description,
-      
-    }
-    userService.updateUser(user, req.params.id)
-    .then(data => res.send(data))
-    .catch(err => next(new GeneralError('Internal Error')));
-  
-    
+function updateUser(req, res, next) {
+  let user = {
+    login: req.body.login,
+    password: req.body.password,
+    description: req.body.description,
   }
+  userService
+    .updateUser(user, req.params.id)
+    .then((data) => res.send(data))
+    .catch((err) => next(new GeneralError('Internal Error')))
+}
 
-
+/**
+ * @exports
+ */
 module.exports = {
   getUser,
   updateUser,
