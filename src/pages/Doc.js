@@ -1,6 +1,14 @@
 import React from 'react'
 
+/**
+ * @function Doc
+ * @description Static page for Doc container
+ * @exports
+ */
 export default function Doc() {
+  /**
+   * Styles
+   */
   const container = {
     width: '100%',
     height: '100%',
@@ -13,6 +21,7 @@ export default function Doc() {
   const content = {
     color: '#fff',
   }
+
   return (
     <div style={container}>
       <h1 style={title}> DOCS </h1>

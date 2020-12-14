@@ -6,6 +6,11 @@ import About from './about'
 import Explore from './Explore'
 import Doc from './Doc'
 
+/**
+ * @function home
+ * @description Home container
+ * @exports
+ */
 export default function Home() {
   /**
    * State
@@ -21,6 +26,9 @@ export default function Home() {
     height: '100%',
   }
 
+  /**
+   * Switcher to figure out which container to display
+   */
   const containerType = () => {
     switch (pageName) {
       case 'Explore':

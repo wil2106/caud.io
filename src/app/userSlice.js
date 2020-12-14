@@ -1,12 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { RandomColor } from '../components/hooks/useRandomColor'
+
 /**
  * Default state of User
- * Note: the values are purely for debugging purpose, everything should be either empty array either null
- * Should remove value before production commits
  */
-
 const color = RandomColor()
 const defaultUser = {
   login: '',
@@ -65,16 +63,25 @@ export const {
 } = userSlice.actions
 
 // Export thunks
-
+/**
+ * @function logMeIn
+ * @description Login user backend call (redux thunk)
+ * @param {string} login user login from form
+ * @param {string} password user password from form
+ * @param {callback} successCb callback upon success
+ * @exports
+ */
 export const logMeIn = (login, password, successCb) => (dispatch) => {
   dispatch(setLoginLoading(true))
 
+  // Backend login call
   axios
     .post('/api/login', {
       login: login,
       password: password,
     })
     .then(function (response) {
+      // Call redux actions to update the store
       dispatch(setLoginLoading(false))
       dispatch(
         setUserData({
@@ -83,6 +90,7 @@ export const logMeIn = (login, password, successCb) => (dispatch) => {
           id: response.data.data.id,
         })
       )
+      // Upon sucess, callback
       successCb()
     })
     .catch(function (error) {
@@ -99,16 +107,28 @@ export const logMeIn = (login, password, successCb) => (dispatch) => {
     })
 }
 
+/**
+ * @function signMeUp
+ * @description Register user backend call (redux thunk)
+ * @param {string} login user login from form
+ * @param {string} password user password from form
+ * @param {callback} successCb callback upon success
+ * @exports
+ */
 export const signMeUp = (login, password, successCb) => (dispatch) => {
   dispatch(setSignUpLoading(true))
 
+  // Backend register call
   axios
     .post('/api/register', {
       login: login,
       password: password,
     })
     .then(function (response) {
+      // Call redux actions to update the store
       dispatch(setSignUpLoading(false))
+
+      // Upon sucess, callback
       successCb()
     })
     .catch(function (error) {
@@ -125,6 +145,11 @@ export const signMeUp = (login, password, successCb) => (dispatch) => {
     })
 }
 
+/**
+ * @function logout
+ * @description clear local store data
+ * @exports
+ */
 export const logout = () => (dispatch) => {
   dispatch(setUserData({ login: '', token: '' }))
 }

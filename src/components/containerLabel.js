@@ -13,6 +13,12 @@ const COLOR_ACTIVE = '#fff'
 const COLOR_INACTIVE = '#717790'
 const BACKGROUND_HOVER = '#272a33'
 
+/**
+ * @function ContainerLabel
+ * @param {Object} props React component props
+ * @exports
+ * @description Components used in ContainerSwitcher as a interactive node
+ */
 export default function ContainerLabel(props) {
   const { list } = props
 
@@ -59,10 +65,11 @@ export default function ContainerLabel(props) {
    */
   const onClick = !selected
     ? () => {
-        dispatch(containerNavigate({ name: list.name }))
-        dispatch(requireContainerList(list.list))
-        setHover(false)
-      }
+      // Dispatches store changes
+      dispatch(containerNavigate({ name: list.name }))
+      dispatch(requireContainerList(list.list))
+      setHover(false)
+    }
     : null
   const onMouseEnter = !selected ? () => setHover(true) : null
   const onMouseLeave = !selected ? () => setHover(false) : null

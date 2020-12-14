@@ -5,15 +5,24 @@ import FavoriteIcon from '@material-ui/icons/Favorite'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import ForkIcon from './../assets/svg/fork'
 import defaultPicture from './../assets/picture/defaultMusic.jpg'
-import { containers } from '../app/UIConstants'
 
+/**
+ * @function MusicCard
+ * @param {Object} props React props 
+ * @exports
+ * @description Music Card component used in Music container to display music objects
+ */
 export default function MusicCard(props) {
-  const { musicID } = props
   /**
    * State
    */
+  const { musicID } = props
   const [hover, setHover] = useState(false)
   const musicObject = useSelector((state) => state.MusicPack.musics[musicID])
+  const musicPicture = musicObject.image ? musicObject.image : defaultPicture
+  const username = musicObject.login
+    ? musicObject.login.split('@')[0]
+    : 'Default'
 
   /**
    * Style
@@ -109,11 +118,6 @@ export default function MusicCard(props) {
   const onMouseEnter = () => setHover(true)
   const onMouseLeave = () => setHover(false)
   const onPlayButtonClick = () => {}
-
-  const musicPicture = musicObject.image ? musicObject.image : defaultPicture
-  const username = musicObject.login
-    ? musicObject.login.split('@')[0]
-    : 'Default'
 
   return (
     <div

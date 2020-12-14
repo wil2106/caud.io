@@ -10,7 +10,16 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { selectCurrentList, selectLoading } from '../app/musicPackSlice'
 import { selectCurrentContainerName } from '../app/uiController'
 
+/**
+ * @function MusicContainer
+ * @param {Object} props React props 
+ * @description Music container component displaying music object inside cards
+ * @exports
+ */
 export default function MusicContainer(props) {
+  /**
+   * States
+   */
   const { listCustom } = props
   // List passed should be a list of musicIDs (see redux store)
   const musicList = useSelector(selectCurrentList) ?? listCustom
@@ -18,12 +27,13 @@ export default function MusicContainer(props) {
   const searchResult = useSelector(selectSearchList)
   const list = searchResult?.length === 0 ? musicList : searchResult
   const [scrollPosition, setScrollPosition] = useState(0)
-
   const loading = useSelector(selectLoading)
-
   const dispatch = useDispatch()
   const containerRef = useRef(null)
 
+  /**
+   * Use effect hooks
+   */
   // Dynamic resource loading
   useEffect(() => {
     if (scrollPosition >= 0.9) {
@@ -54,10 +64,14 @@ export default function MusicContainer(props) {
     alignContent: 'flex-start',
   }
 
+  // Music card renders
   const CardRender = list.map((element, key) => (
     <MusicCard musicID={element} key={key} />
   ))
 
+  /**
+   * Event handlers
+   */
   const onScroll = debounce((event) => {
     const { scrollHeight, clientHeight } = containerRef.current
     const target = event.target

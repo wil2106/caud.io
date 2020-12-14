@@ -1,5 +1,9 @@
 import React from 'react'
 
+/**
+ * @function EmptyContainer
+ * @description Simple empty container component
+ */
 export default function EmptyContainer() {
   const container = {
     height: '100%',

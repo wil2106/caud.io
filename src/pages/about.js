@@ -1,7 +1,15 @@
 import React from 'react'
 import Logo from './../assets/svg/logo'
 
+/**
+ * @function About
+ * @description Static page for About container
+ * @exports
+ */
 export default function About() {
+  /**
+   * Styles
+   */
   const container = {
     width: '100%',
     height: '100%',

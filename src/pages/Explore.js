@@ -12,8 +12,12 @@ import GreyButton from './../components/greyButton'
 import Box from '@material-ui/core/Box'
 import Snackbar from '@material-ui/core/Snackbar'
 import ProfileIndicator from '../components/profileIndicator'
-import { selectCurrent } from '../app/uiController'
 
+/**
+ * @function Explore
+ * @description Explore container in home page
+ * @exports
+ */
 export default function Explore() {
   /**
    * State

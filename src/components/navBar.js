@@ -10,6 +10,12 @@ import { pages } from './../app/UIConstants'
 const LOGO_SIZE = 60
 const CREATE_NEW = 'NEW'
 
+/**
+ * @function NavBar
+ * @param {Object} props React props
+ * @description Navbar component used in home page
+ * @exports
+ */
 export default function NavBar(props) {
   /**
    * Style

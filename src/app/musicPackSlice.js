@@ -6,7 +6,7 @@ import {
   retrieveUserMusic,
   searchMusic,
 } from '../api/musicPack'
-import { createBlobURL, imageBufferToBase64 } from '../utils'
+import { createBlobURL } from '../utils'
 import { containers } from './UIConstants'
 import _ from 'lodash'
 import { setMusicIDs } from './userSlice'
@@ -38,6 +38,7 @@ export const musicPackSlice = createSlice({
   reducers: {
     addToList: (state, action) => {
       const { listName, elements } = action.payload
+      // For each element, verify if the ID is already in the list, if not add to the list
       elements?.forEach((element) => {
         if (!state[listName].includes(element)) {
           state[listName].push(element)
@@ -66,6 +67,8 @@ export const musicPackSlice = createSlice({
     addToMusics: (state, action) => {
       const temp = {}
       action.payload.forEach((music) => (temp[music.id] = music))
+      // Using assign() to merge objects.
+      // See MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
       Object.assign(state.musics, temp)
     },
     setPages: (state, action) => {
@@ -74,7 +77,7 @@ export const musicPackSlice = createSlice({
     },
     addToSearch: (state, action) => {
       if (!action.payload?.length) return
-      console.log(action.payload)
+      // Spread operator to merge the arrays
       state.searchResult.push(...action.payload)
     },
     resetSearchList: (state) => {
@@ -96,11 +99,17 @@ export const {
 } = musicPackSlice.actions
 
 // Export thunks
+/**
+ * @function requestNextPage
+ * @param {string} listName 
+ * @async
+ * @description used for dynamic loading upon scroll in the music container
+ * @exports
+ */
 export const requestNextPage = (listName) => async (dispatch, getState) => {
   const state = getState()
   const { loading } = state.MusicPack
   if (loading) return
-  const currentActiveContainer = state.UIController.currentContainer
 
   // Set loading animation
   dispatch(setLoading({ loading: true }))
@@ -120,23 +129,26 @@ export const requestNextPage = (listName) => async (dispatch, getState) => {
   dispatch(setLoading({ loading: false }))
 }
 
-export const reloadRecentIDs = () => async (dispatch) => {
-  dispatch(clearRecentIDs())
-  const res = await retrieveRecentMusics(1)
-  dispatch(
-    addToList({
-      listName: 'mostRecentIDs',
-      elements: res,
-    })
-  )
-}
-
+/**
+ * @function retrieveLightMusicObjectFromIDs
+ * @param {Array} ids Array of music object ID
+ * @description Used to retrieve music previews
+ * @async
+ * @exports
+ */
 export const retrieveLightMusicObjectFromIDs = (ids) => async (dispatch) => {
   // Retrieve object
   const res = await retrieveMusicObject(ids)
   dispatch(updateMusicObject(res))
 }
 
+/**
+ * @function retrieveMusics
+ * @param {Array} ids Array of music object IDs
+ * @description retrieve list of music object based on the list of IDs
+ * @async
+ * @exports
+ */
 export const retrieveMusics = (ids) => async (dispatch) => {
   const result = await retrieveLightMusicObjectFromIDs(ids)
   if (!result?.data) return
@@ -153,11 +165,19 @@ export const retrieveMusics = (ids) => async (dispatch) => {
   dispatch(addToMusics(blobedArray))
 }
 
+/**
+ * @function requireContainerList
+ * @param {string} listName Container name
+ * @description Retrieve list of music objects between most liked, most forked, most listened, most recent.
+ * @exports
+ * @async
+ */
 export const requireContainerList = (listName) => async (
   dispatch,
   getState
 ) => {
   const state = getState()
+  // Set the name of the page for redux store property
   const page = state.MusicPack[`${listName}Page`]
   // Set loading animation
   dispatch(setLoading({ loading: true }))
@@ -171,6 +191,13 @@ export const requireContainerList = (listName) => async (
   dispatch(setLoading({ loading: false }))
 }
 
+/**
+ * @function retrieveAPIMusic
+ * @param {string} listName Container list name
+ * @param {number} page #page to retrieve
+ * @param {*} dispatch dispatch redux object passed down
+ * @async
+ */
 const retrieveAPIMusic = async (listName, page, dispatch) => {
   let result
   try {
@@ -194,6 +221,13 @@ const retrieveAPIMusic = async (listName, page, dispatch) => {
   }
 }
 
+/**
+ * @function searchAPI
+ * @param {string} keyword keyword for search query
+ * @description Call search API with keyword parameters
+ * @async
+ * @exports
+ */
 export const searchAPI = (keyword) => async (dispatch) => {
   try {
     const res = await searchMusic(keyword)
@@ -207,6 +241,13 @@ export const searchAPI = (keyword) => async (dispatch) => {
   }
 }
 
+/**
+ * @function getUserMusics
+ * @param {string} id User id
+ * @async
+ * @exports
+ * @description from user id, retrieve the list of ID whom author is specified ID
+ */
 export const getUserMusics = (id) => async (dispatch, getState) => {
   const state = getState()
   if (state.User?.token) return

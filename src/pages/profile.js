@@ -5,17 +5,30 @@ import MusicContainer from './../components/musicContainer'
 import Logo from './../assets/svg/logo'
 import { useHistory } from 'react-router-dom'
 
+/**
+ * @function ProfilePage
+ * @description Profile page to access an users' profile information
+ * @exports
+ */
 export default function ProfilePage() {
+  /**
+   * State
+   */
   const user = useSelector((state) => state.User)
   const dispatch = useDispatch()
   const history = useHistory()
   const { login, description, userMusicIDs } = user
-
   const descriptionDisplay = 'Default description' ?? description
 
+  /**
+   * Init
+   */
   dispatch(getUserMusics(login))
   dispatch(retrieveMusics(userMusicIDs))
 
+  /**
+   * Style
+   */
   const container = {
     width: '100%',
     height: '100%',
@@ -39,6 +52,9 @@ export default function ProfilePage() {
     cursor: 'pointer',
   }
 
+  /**
+   * Event handler
+   */
   const logoOnClick = () => history.push('/home')
 
   return (
