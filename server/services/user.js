@@ -1,8 +1,18 @@
 const sequelize = require('../db');
 const Users = require('../models').User;
+const Music = require('../models').Music
 
 const addUser = user => Users.create(user);
-const getUserByLogin = login => Users.findOne({where: {login}});
+const getUserByID = (id) => Users.findOne({ where: { id } })
+
+const getUserMusics = (id, limit, offset) =>
+  Music.findAll({
+    attributes: ['id'],
+    where: { fk_author: id },
+    limit,
+    offset,
+  })
+
 const deleteUser = id_ => Users.destroy({ 
     where: { id: id_ }
 });
@@ -18,9 +28,10 @@ const updateUser = (user, id_) => Users.update(
 );
 
 module.exports = {
-    addUser,
-    getUserByLogin,
-    deleteUser,
-    updateUser,
-    getUserLoginById
+  addUser,
+  getUserByID,
+  deleteUser,
+  updateUser,
+  getUserLoginById,
+  getUserMusics,
 }

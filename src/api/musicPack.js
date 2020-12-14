@@ -48,3 +48,15 @@ export const searchMusic = async (keyword) => {
     console.log(err)
   }
 }
+
+export const retrieveUserMusic = async (id, token) => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  }
+  try {
+    const res = await axios.get(`api/user/${id}/musicIDs`, null, config)
+    return res.data
+  } catch (err) {
+    console.log(err)
+  }
+}

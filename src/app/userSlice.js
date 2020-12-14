@@ -48,6 +48,9 @@ export const userSlice = createSlice({
       state.login = login
       state.token = token
     },
+    setMusicIDs: (state, action) => {
+      state.userMusicsIDs.push(...action.payload)
+    },
   },
 })
 
@@ -58,6 +61,7 @@ export const {
   setSignUpLoading,
   setSignUpError,
   setUserData,
+  setMusicIDs,
 } = userSlice.actions
 
 // Export thunks
@@ -72,7 +76,13 @@ export const logMeIn = (login, password, successCb) => (dispatch) => {
     })
     .then(function (response) {
       dispatch(setLoginLoading(false))
-      dispatch(setUserData({ login: login, token: response.data.data.token }))
+      dispatch(
+        setUserData({
+          login: login,
+          token: response.data.data.token,
+          id: response.data.data.id,
+        })
+      )
       successCb()
     })
     .catch(function (error) {

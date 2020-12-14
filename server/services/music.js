@@ -84,12 +84,15 @@ const searchTitle = (search_, limit, offset) => Music.findAll({
     offset
 });
 
-const fullMusic = id_ => Music.findAll({
-    where: {
-        id: id_,
-        private: false
-    }
-});
+const fullMusic = (id_) =>
+  sequelize.query(
+    `SELECT music.id, music.title, music.nb_forks,
+    music.nb_likes, music.nb_listen, music.can_fork,
+    users.login, encode(image, 'base64') as image
+    FROM music, users
+    WHERE music.fk_author=users.id AND music.id=$id`,
+    { bind: { id: id_ }, type: sequelize.QueryTypes.SELECT }
+  )
 
 const musicContent = id_ => Music.findAll({
     attributes: ["setup_code", "step_code"],
