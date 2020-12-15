@@ -51,7 +51,7 @@ Music.belongsToMany(Sample, { through: Library });
 Sample.belongsToMany(Music, { through: Library });
 
 
-sequelize.sync({ force: false })
+sequelize.sync({ force: true })
   .then(() => {
     console.log(`Database & tables created!`)
 })
