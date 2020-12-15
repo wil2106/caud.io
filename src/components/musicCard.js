@@ -19,12 +19,21 @@ export default function MusicCard(props) {
   /**
    * State
    */
+
   const history = useHistory()
   const userID = useSelector(selectID)
-  const { musicID,  handleMusicPlay, handleMusicStop} = props
+  const { musicID,  handleMusicPlay, handleMusicStop, isSearch} = props
   const [hover, setHover] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
-  const musicObject = useSelector((state) => state.MusicPack.musics[musicID])
+  let musicObject
+  musicObject = useSelector((state) => { 
+    if(isSearch)
+      return state.MusicPack.searchResult[musicID]
+    else
+      return  state.MusicPack.musics[musicID]
+  })
+
+  
   const musicPicture = musicObject.image ? musicObject.image : defaultPicture
   const username = musicObject.login
     ? musicObject.login.split('@')[0]
