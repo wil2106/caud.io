@@ -173,6 +173,7 @@ export default function Editor(props) {
   const [synthVariables, setSynthVariables] = useState([]);
   const [sampleVariables, setSampleVariables] = useState([]);
 
+
   const [mode, setMode] = useState((location.state && location.state.mode) ? location.state.mode : 'create');
   const [musicObject, setMusicObject] = useState((location.state && location.state.musicObject) ? location.state.musicObject : '');
 
@@ -243,9 +244,12 @@ export default function Editor(props) {
 
 
   useEffect(() => {
-    let mode = userID === musicObject.fk_author ? 'edit' : 'view'
-    setMode(mode)
+    if(location.state && location.state.mode){
+      let mode = userID === musicObject.fk_author ? 'edit' : 'view'
+      setMode(mode)
+    }
   }, [userID])
+
 
   const handleStartAudioContextAndCloseDialog = () => {
     musicPlayer.startAudioContext()
@@ -512,7 +516,7 @@ export default function Editor(props) {
                   onChange={handleSetupCodeChange}
                   editorProps={{ $blockScrolling: true }}
                   value={setupCode}
-                  readOnly={mode === "view"}
+                  readOnly={ mode === "view"}
                 />
                 {setupCodeError && <Box className={classes.editorErrorConsole}>{setupCodeError}</Box>}
               </Box>
