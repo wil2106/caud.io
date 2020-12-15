@@ -10,11 +10,17 @@ const COLOR_ACTIVE = '#fff'
 const COLOR_INACTIVE = '#717790'
 const BACKGROUND_HOVERED = '#393c45'
 
+/**
+ * @function NavItem
+ * @param {Object} props React props
+ * @description Navitem used in NavBar for each page container specified in UIConstants
+ * @exports
+ */
 export default function NavItem(props) {
-  const { icon: Icon, title } = props.page
   /**
    * State
    */
+  const { icon: Icon, title } = props.page
   const [hover, setHover] = useState(false)
   const dispatch = useDispatch()
   /**

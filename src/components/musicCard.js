@@ -4,16 +4,31 @@ import { useSelector } from 'react-redux'
 import FavoriteIcon from '@material-ui/icons/Favorite'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import ForkIcon from './../assets/svg/fork'
+import defaultPicture from './../assets/picture/defaultMusic.jpg'
+import StopIcon from '@material-ui/icons/Stop';
+import { selectID } from '../app/userSlice'
+import { useHistory } from 'react-router-dom'
 
+/**
+ * @function MusicCard
+ * @param {Object} props React props 
+ * @exports
+ * @description Music Card component used in Music container to display music objects
+ */
 export default function MusicCard(props) {
-  const { musicID } = props
   /**
    * State
    */
+  const history = useHistory()
+  const userID = useSelector(selectID)
+  const { musicID,  handleMusicPlay, handleMusicStop} = props
   const [hover, setHover] = useState(false)
-  const musicObject = useSelector((state) =>
-    state.MusicPack.musics.find((element) => element.id === musicID)
-  )
+  const [isPlaying, setIsPlaying] = useState(false)
+  const musicObject = useSelector((state) => state.MusicPack.musics[musicID])
+  const musicPicture = musicObject.image ? musicObject.image : defaultPicture
+  const username = musicObject.login
+    ? musicObject.login.split('@')[0]
+    : 'Default'
 
   /**
    * Style
@@ -23,7 +38,7 @@ export default function MusicCard(props) {
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    height: 284,
+    height: 350,
     marginLeft: 20,
     marginRight: 20,
     marginTop: !hover && 20,
@@ -31,10 +46,11 @@ export default function MusicCard(props) {
 
   const imageStyle = {
     width: 230,
-    height: 'auto',
+    height: 230,
     filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))',
     marginTop: 10,
     alignSelf: 'center',
+    objectFit: 'cover',
   }
 
   const titleStyle = {
@@ -87,6 +103,20 @@ export default function MusicCard(props) {
     right: 20,
   }
 
+  const stopButtonStyle = {
+    width: 30,
+    height: 30,
+    backgroundColor: '#CE4848',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  }
+
   const buttonsContainer = {
     display: 'flex',
     flexDirection: 'row',
@@ -107,25 +137,57 @@ export default function MusicCard(props) {
    */
   const onMouseEnter = () => setHover(true)
   const onMouseLeave = () => setHover(false)
-  const onPlayButtonClick = () => {}
+
+  const onPlayButtonClick = (e, musicObject) => {
+    e.stopPropagation();
+    setIsPlaying(true)
+    handleMusicPlay(musicObject)
+  }
+
+  const onStopButtonClick = (e) => {
+    e.stopPropagation();
+    setIsPlaying(false)
+    handleMusicStop()
+  }
+
+  const handleCardClick = () => {
+    let mode = userID === musicObject.fk_author ? 'edit' : 'view'
+    let parameters = {
+      mode: mode,
+      musicObject: musicObject
+    } 
+    history.push({
+      pathname: '/editor',
+      state: parameters
+    })
+  }
+
+  const ButtonRender = isPlaying ? (
+    <ButtonBase style={stopButtonStyle} onClick={(e)=>onStopButtonClick(e)}>
+      <StopIcon style={{ color: '#fff' }} />
+    </ButtonBase>
+  )
+  :
+  (
+    <ButtonBase style={playButtonStyle} onClick={(e)=>{onPlayButtonClick(e,musicObject)}}>
+      <PlayArrowIcon style={{ color: '#fff' }} />
+    </ButtonBase>
+  )
 
   return (
     <div
       style={container}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onClick={handleCardClick}
     >
       <div style={containerWrapper}>
         <div style={{ width: '100%', position: 'relative' }}>
-          <img src={musicObject.image} style={imageStyle} />
-          {hover && (
-            <ButtonBase style={playButtonStyle} onClick={onPlayButtonClick}>
-              <PlayArrowIcon style={{ color: '#fff' }} />
-            </ButtonBase>
-          )}
+          <img src={musicPicture} style={imageStyle} />
+          {hover && ButtonRender}
         </div>
         <h1 style={titleStyle}>{musicObject.title}</h1>
-        <p style={authorStyle}>{`By ${musicObject.username}`}</p>
+        <p style={authorStyle}>{`By ${username}`}</p>
         {hover ? (
           <div style={buttonsContainer}>
             <Button style={optionStyle}>

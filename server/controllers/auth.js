@@ -1,33 +1,50 @@
-const config =  require('../config');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const config = require('../config')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
-const authService = require('../services/auth');
-const userService = require('../services/user');
-const { GeneralError, BadRequest } = require('../middlewares/errorClass');
+const authService = require('../services/auth')
+const userService = require('../services/user')
+const { GeneralError, BadRequest } = require('../middlewares/errorClass')
 
-function login(req, res, next){
-     const { login, password } = req.body
-     if (!req.body || !login || !password) return next(new BadRequest('Incomplete credentials.'))
-    return authService.authenticate(req.body)
-    .then(token => {
-         res.send({
-              success: true,
-              data: { token }
-         });
+/**
+ * @function login
+ * @description connecte un utilisateur
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function login(req, res, next) {
+  const { login, password } = req.body
+  // Upon empty body, return error to middleware
+  if (!req.body || !login || !password)
+    return next(new BadRequest('Incomplete credentials.'))
+  return authService
+    .authenticate(req.body)
+    .then(({ token, id }) => {
+      res.send({
+        success: true,
+        data: { token, id },
+      })
     })
-    .catch(err => {
-         res.status(401).send({
-              success: false,
-              message: err.message 
-         });
+    .catch((err) => {
+      res.status(401).send({
+        success: false,
+        message: err.message,
+      })
     })
-};
+}
 
+/**
+ * @function register 
+ * @description crée un compte utilisateur
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
 function register(req, res, next){
      const { login, password } = req.body
      if (!req.body || !login || !password ) return next(new BadRequest('Incomplete credentials.'))
-    return userService.getUserByLogin(req.body.login || '')
+    return userService.getUserByLogin(req.body.login)
     .then(exists => {
          if (exists){
               return res.status(409).send({
@@ -41,12 +58,19 @@ function register(req, res, next){
           }
          return userService.addUser(user)
          .then(() => res.send({success: true}))
-         .catch(err => next(new GeneralError('Internal Error')));
+         .catch(err => {
+               next(new GeneralError('Internal Error'))
+         });
     })
-    .catch(err => next(new GeneralError('Internal Error')));
+    .catch(err =>{
+          next(new GeneralError('Internal Error'))
+    });
 };
 
+/**
+ * @exports
+ */
 module.exports = {
-    login,
-    register
+  login,
+  register,
 }

@@ -1,15 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { RandomColor } from '../components/hooks/useRandomColor'
+
 /**
  * Default state of User
- * Note: the values are purely for debugging purpose, everything should be either empty array either null
- * Should remove value before production commits
  */
-
 const color = RandomColor()
 const defaultUser = {
   login: '',
+  id: '',
   description: '',
   token: '',
   userMusicsIDs: [],
@@ -44,9 +43,13 @@ export const userSlice = createSlice({
       state.login = action.payload
     },
     setUserData: (state, action) => {
-      const { login, token } = action.payload
+      const { login, token, id } = action.payload
       state.login = login
       state.token = token
+      state.id = id
+    },
+    setMusicIDs: (state, action) => {
+      state.userMusicsIDs.push(...action.payload)
     },
   },
 })
@@ -58,21 +61,38 @@ export const {
   setSignUpLoading,
   setSignUpError,
   setUserData,
+  setMusicIDs,
 } = userSlice.actions
 
 // Export thunks
-
+/**
+ * @function logMeIn
+ * @description Login user backend call (redux thunk)
+ * @param {string} login user login from form
+ * @param {string} password user password from form
+ * @param {callback} successCb callback upon success
+ * @exports
+ */
 export const logMeIn = (login, password, successCb) => (dispatch) => {
   dispatch(setLoginLoading(true))
 
+  // Backend login call
   axios
     .post('/api/login', {
       login: login,
       password: password,
     })
     .then(function (response) {
+      // Call redux actions to update the store
       dispatch(setLoginLoading(false))
-      dispatch(setUserData({ login: login, token: response.data.data.token }))
+      dispatch(
+        setUserData({
+          login: login,
+          token: response.data.data.token,
+          id: response.data.data.id,
+        })
+      )
+      // Upon sucess, callback
       successCb()
     })
     .catch(function (error) {
@@ -89,16 +109,28 @@ export const logMeIn = (login, password, successCb) => (dispatch) => {
     })
 }
 
+/**
+ * @function signMeUp
+ * @description Register user backend call (redux thunk)
+ * @param {string} login user login from form
+ * @param {string} password user password from form
+ * @param {callback} successCb callback upon success
+ * @exports
+ */
 export const signMeUp = (login, password, successCb) => (dispatch) => {
   dispatch(setSignUpLoading(true))
 
+  // Backend register call
   axios
     .post('/api/register', {
       login: login,
       password: password,
     })
     .then(function (response) {
+      // Call redux actions to update the store
       dispatch(setSignUpLoading(false))
+
+      // Upon sucess, callback
       successCb()
     })
     .catch(function (error) {
@@ -115,12 +147,18 @@ export const signMeUp = (login, password, successCb) => (dispatch) => {
     })
 }
 
+/**
+ * @function logout
+ * @description clear local store data
+ * @exports
+ */
 export const logout = () => (dispatch) => {
   dispatch(setUserData({ login: '', token: '' }))
 }
 
 // Export selectors
 export const selectLogin = (state) => state.User.login
+export const selectID = (state) => state.User.id
 export const selectLoginLoading = (state) => state.User.loginLoading
 export const selectSignUpLoading = (state) => state.User.signUpLoading
 export const selectLoginError = (state) => state.User.loginError

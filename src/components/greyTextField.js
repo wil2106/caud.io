@@ -8,9 +8,14 @@ const BACKGROUND_ACTIVE = '#393c45'
 const BACKGROUND_INACTIVE = '#252830'
 const BACKGROUND_HOVERED = '#393c45'
 
-export default function SearchBar(props) {
-
-  const { placeHolder, handleChange } = props; 
+/**
+ * @function SearchBar
+ * @param {Object} props React props
+ * @exports
+ * @description SearchBar component
+ */
+export default function GreyTextField(props) {
+  const { placeHolder, handleChange } = props
   /**
    * State
    */

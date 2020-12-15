@@ -4,12 +4,22 @@ import NavItem from './navItem'
 import { Button } from '@material-ui/core'
 import { pages } from './../app/UIConstants'
 
+import {
+  Link
+} from "react-router-dom";
+
 /**
  * Constants
  */
 const LOGO_SIZE = 60
 const CREATE_NEW = 'NEW'
 
+/**
+ * @function NavBar
+ * @param {Object} props React props
+ * @description Navbar component used in home page
+ * @exports
+ */
 export default function NavBar(props) {
   /**
    * Style
@@ -46,7 +56,13 @@ export default function NavBar(props) {
           <NavItem  page={element} key={key} />
         ))}
       </>
-      <Button style={buttonStyle}>{CREATE_NEW}</Button>
+      
+      <Link to="/editor" style={{ textDecoration: 'none', color: '#000'}}>
+        <Button style={buttonStyle}>
+        {CREATE_NEW}
+        </Button>
+      </Link>
+      
     </div>
   )
 }

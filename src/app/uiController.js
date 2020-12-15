@@ -3,6 +3,8 @@ import { containers, pages } from './UIConstants'
 
 /**
  * Default state of UIController
+ * current controls the current container relative to the navbar
+ * curretnContainer controls the current container in the Explore container
  */
 const defaultState = {
   current: 'Explore',
@@ -32,6 +34,10 @@ export const { navigate, containerNavigate } = UISlicer.actions
 export const selectCurrent = (state) => state.UIController.current
 export const selectCurrentContainer = (state) =>
   state.UIController.currentContainer
+export const selectCurrentContainerName = (state) =>
+  containers.find(
+    (element) => element.name === state.UIController.currentContainer
+  )?.list
 
 // Export default reducers
 export default UISlicer.reducer
