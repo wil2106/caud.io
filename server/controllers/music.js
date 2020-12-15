@@ -298,12 +298,13 @@ function mostListen(req, res, next) {
 function searchTitle(req, res, next) {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
-  Promise.all([musicService.searchTitle(req.params.search, limit, offset)])
-    .then((data) => {
-      const response = getPaginationData(data, page, limit)
-      res.send(response)
-    })
-    .catch((err) => next(new GeneralError('Internal Error')))
+
+  musicService.searchTitle(req.params.search, limit, offset).then((data) => {
+    let formatedList = data.map(((music)=>({...music.dataValues, image: Buffer.from(music.image).toString('base64')})))
+    //const response = getPaginationData(formatedList, page, limit)
+    res.send(formatedList)
+  })
+  .catch((err) => next(new GeneralError('Internal Error')))   
 }
 
 /**

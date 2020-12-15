@@ -89,7 +89,6 @@ const mostListen = (limit, offset) =>
 
 const searchTitle = (search_, limit, offset) =>
   Music.findAll({
-    attributes: ['id', 'title', 'updatedAt'],
     where: {
       title: { [Op.substring]: search_ },
     },

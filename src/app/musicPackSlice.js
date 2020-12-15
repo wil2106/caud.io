@@ -92,6 +92,9 @@ export const musicPackSlice = createSlice({
     setNewMusicLoading: (state, action) => {
       state.newMusicLoading = action.payload
     },
+    setSearchResults: (state, action) => {
+      state.searchResult = action.payload
+    },
   },
 })
 
@@ -106,7 +109,8 @@ export const {
   addToSearch,
   resetSearchList,
   setNewMusicError,
-  setNewMusicLoading
+  setNewMusicLoading,
+  setSearchResults
 } = musicPackSlice.actions
 
 // Export thunks
@@ -239,11 +243,16 @@ const retrieveAPIMusic = async (listName, page, dispatch) => {
 export const searchAPI = (keyword) => async (dispatch) => {
   try {
     const res = await searchMusic(keyword)
+    if(res){
+      let formattedList = res.map((music)=> ({...music, image: `data:image/png;base64,${music.image}`}))
+      dispatch(setSearchResults(formattedList))
+    }
+    /*
     if (!res?.data) return
     dispatch(addToMusics(res.data[0]))
-
     const ids = res.data[0].map((element) => element.id)
     dispatch(addToSearch(ids))
+    */
   } catch (err) {
     console.log(err)
   }

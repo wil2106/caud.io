@@ -35,7 +35,6 @@ export default function MusicContainer(props) {
   const musicList = useSelector(selectCurrentList) ?? listCustom
   const musicListName = useSelector(selectCurrentContainerName)
   const searchResult = useSelector(selectSearchList)
-  const list = searchResult?.length === 0 ? musicList : searchResult
   const [scrollPosition, setScrollPosition] = useState(0)
   const loading = useSelector(selectLoading)
   const dispatch = useDispatch()
@@ -61,6 +60,7 @@ export default function MusicContainer(props) {
   useEffect(() => {
     containerRef.current.scrollTop = 0
   }, [musicListName])
+
 
   /**
    * Style
@@ -110,8 +110,13 @@ export default function MusicContainer(props) {
   }
 
   // Music card renders
-  const CardRender = list.map((element, key) => (
-    <MusicCard musicID={element} key={key} handleMusicPlay={handleMusicPlay} handleMusicStop={handleMusicStop}/>
+  const CardRender = musicList.map((element, key) => (
+    <MusicCard musicID={element} key={key} handleMusicPlay={handleMusicPlay} handleMusicStop={handleMusicStop} musicObject={element} isSearch={false}/>
+  ))
+
+   // Music card renders
+   const CardSearchResultsRender = searchResult.map((element, key) => (
+    <MusicCard musicID={key} key={key} handleMusicPlay={handleMusicPlay} handleMusicStop={handleMusicStop} musicObject={element} isSearch={true}/>
   ))
 
   return useMemo(() => (
@@ -120,7 +125,9 @@ export default function MusicContainer(props) {
         <h1 style={{ color: 'white' }}>Search Result:</h1>
       )}
       <div style={container} onScroll={onScroll} ref={containerRef}>
-        {list.length ? CardRender : <EmptyContainer />}
+        {searchResult.length > 0 && CardSearchResultsRender }
+        {(musicList.length > 0 && searchResult.length === 0) && CardRender}
+        {(musicList.length === 0 && searchResult.length === 0) && <EmptyContainer />}
         <Box display="flex" justifyContent="center" width={1} m={2}>
           {loading && <CircularProgress style={{ color: '#47CF73' }} />}
         </Box>
