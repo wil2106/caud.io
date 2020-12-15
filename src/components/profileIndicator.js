@@ -5,7 +5,16 @@ import { useSelector, useDispatch } from 'react-redux'
 import { logout, selectLogin, selectUserColor } from '../app/userSlice'
 import { useHistory } from 'react-router-dom'
 
+/**
+ * @function ProfileIndicator
+ * @param {Object} props React props
+ * @description Simple UI element to display an User with the submenu associated to it upon click
+ * @exports
+ */
 export default function ProfileIndicator(props) {
+  /**
+   * States
+   */
   const { host } = props
   const [anchorEl, setAnchorEl] = useState(null)
   const user = useSelector(selectLogin)
@@ -13,6 +22,9 @@ export default function ProfileIndicator(props) {
   const dispatch = useDispatch()
   const history = useHistory()
 
+  /**
+   * Styles
+   */
   const container = {
     height: 40,
     width: 40,
@@ -35,22 +47,18 @@ export default function ProfileIndicator(props) {
     left: 8,
   }
 
+  /**
+   * Event handlers
+   */
   const handleClose = () => setAnchorEl(null)
-
   const handleProfile = () => {
     setAnchorEl(null)
     history.push('/profile')
   }
-
-  const handleAccount = () => {
-    setAnchorEl(null)
-  }
-
   const handleLogout = () => {
     setAnchorEl(null)
     dispatch(logout())
   }
-
   const handleClick = (event) => setAnchorEl(event.currentTarget)
 
   return (

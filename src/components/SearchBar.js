@@ -5,18 +5,28 @@ import { useDispatch } from 'react-redux'
 import CancelIcon from '@material-ui/icons/Cancel'
 import { Box } from '@material-ui/core'
 
+/**
+ * @function SearchBar
+ * @param {Object} props React props
+ * @exports
+ * @description SearchBar component
+ */
 export default function SearchBar() {
+  /**
+   * States
+   */
   const dispatch = useDispatch()
   const [search, setSearch] = useState('')
 
+  /**
+   * Event handlers
+   */
   const searchInputOnChange = ({ target }) => setSearch(target.value)
-
   const enterKeyEvent = ({ keyCode }) => {
     if (keyCode === 13) {
       dispatch(searchAPI(search))
     }
   }
-
   const resetSearch = () => {
     setSearch('')
     dispatch(resetSearchList())

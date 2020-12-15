@@ -1,13 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit'
+import axios from 'axios'
 import {
   retrieveMostList,
   retrieveMusicObject,
   retrieveRecentMusics,
+  retrieveUserMusic,
   searchMusic,
 } from '../api/musicPack'
 import { createBlobURL, imageBufferToBase64 } from '../utils'
 import { containers } from './UIConstants'
 import _ from 'lodash'
+import { setMusicIDs } from './userSlice'
 
 /**
  * Default state of Music Pack
@@ -27,6 +30,8 @@ const defaultMusicPack = {
   mostListenedIDsPage: 0,
   mostForkedIDsPage: 0,
   searchResultPage: 0,
+  newMusicError: '',
+  newMusicLoading: false
 }
 
 // Create MusicPack redux slice
@@ -36,6 +41,7 @@ export const musicPackSlice = createSlice({
   reducers: {
     addToList: (state, action) => {
       const { listName, elements } = action.payload
+      // For each element, verify if the ID is already in the list, if not add to the list
       elements?.forEach((element) => {
         if (!state[listName].includes(element)) {
           state[listName].push(element)
@@ -64,6 +70,8 @@ export const musicPackSlice = createSlice({
     addToMusics: (state, action) => {
       const temp = {}
       action.payload.forEach((music) => (temp[music.id] = music))
+      // Using assign() to merge objects.
+      // See MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
       Object.assign(state.musics, temp)
     },
     setPages: (state, action) => {
@@ -72,11 +80,17 @@ export const musicPackSlice = createSlice({
     },
     addToSearch: (state, action) => {
       if (!action.payload?.length) return
-      console.log(action.payload)
+      // Spread operator to merge the arrays
       state.searchResult.push(...action.payload)
     },
     resetSearchList: (state) => {
       state.searchResult = []
+    },
+    setNewMusicError: (state, action) => {
+      state.newMusicError = action.payload
+    },
+    setNewMusicLoading: (state, action) => {
+      state.newMusicLoading = action.payload
     },
   },
 })
@@ -91,14 +105,22 @@ export const {
   setPages,
   addToSearch,
   resetSearchList,
+  setNewMusicError,
+  setNewMusicLoading
 } = musicPackSlice.actions
 
 // Export thunks
+/**
+ * @function requestNextPage
+ * @param {string} listName 
+ * @async
+ * @description used for dynamic loading upon scroll in the music container
+ * @exports
+ */
 export const requestNextPage = (listName) => async (dispatch, getState) => {
   const state = getState()
   const { loading } = state.MusicPack
   if (loading) return
-  const currentActiveContainer = state.UIController.currentContainer
 
   // Set loading animation
   dispatch(setLoading({ loading: true }))
@@ -118,28 +140,53 @@ export const requestNextPage = (listName) => async (dispatch, getState) => {
   dispatch(setLoading({ loading: false }))
 }
 
-export const reloadRecentIDs = () => async (dispatch) => {
-  dispatch(clearRecentIDs())
-  const res = await retrieveRecentMusics(1)
-  dispatch(
-    addToList({
-      listName: 'mostRecentIDs',
-      elements: res,
-    })
-  )
-}
-
+/**
+ * @function retrieveLightMusicObjectFromIDs
+ * @param {Array} ids Array of music object ID
+ * @description Used to retrieve music previews
+ * @async
+ * @exports
+ */
 export const retrieveLightMusicObjectFromIDs = (ids) => async (dispatch) => {
   // Retrieve object
   const res = await retrieveMusicObject(ids)
   dispatch(updateMusicObject(res))
 }
 
+/**
+ * @function retrieveMusics
+ * @param {Array} ids Array of music object IDs
+ * @description retrieve list of music object based on the list of IDs
+ * @async
+ * @exports
+ */
+export const retrieveMusics = (ids) => async (dispatch) => {
+  const result = await retrieveLightMusicObjectFromIDs(ids)
+  if (!result?.data) return
+  const blobedArray = await Promise.all(
+    result.data.map(async (element) => {
+      if (element.image) {
+        element.image = `data:image/png;base64,${element.image}` 
+      }
+      return element
+    })
+  )
+  dispatch(addToMusics(blobedArray))
+}
+
+/**
+ * @function requireContainerList
+ * @param {string} listName Container name
+ * @description Retrieve list of music objects between most liked, most forked, most listened, most recent.
+ * @exports
+ * @async
+ */
 export const requireContainerList = (listName) => async (
   dispatch,
   getState
 ) => {
   const state = getState()
+  // Set the name of the page for redux store property
   const page = state.MusicPack[`${listName}Page`]
   // Set loading animation
   dispatch(setLoading({ loading: true }))
@@ -153,6 +200,13 @@ export const requireContainerList = (listName) => async (
   dispatch(setLoading({ loading: false }))
 }
 
+/**
+ * @function retrieveAPIMusic
+ * @param {string} listName Container list name
+ * @param {number} page #page to retrieve
+ * @param {*} dispatch dispatch redux object passed down
+ * @async
+ */
 const retrieveAPIMusic = async (listName, page, dispatch) => {
   let result
   try {
@@ -161,10 +215,9 @@ const retrieveAPIMusic = async (listName, page, dispatch) => {
     const blobedArray = await Promise.all(
       result.data.map(async (element) => {
         if (element.image) {
-          const url = `data:image/png;base64,${element.image}`
-          const blob = await (await fetch(url)).blob()
-          element.image = createBlobURL(blob)
+          element.image = `data:image/png;base64,${element.image}` 
         }
+        
         return element
       })
     )
@@ -176,6 +229,13 @@ const retrieveAPIMusic = async (listName, page, dispatch) => {
   }
 }
 
+/**
+ * @function searchAPI
+ * @param {string} keyword keyword for search query
+ * @description Call search API with keyword parameters
+ * @async
+ * @exports
+ */
 export const searchAPI = (keyword) => async (dispatch) => {
   try {
     const res = await searchMusic(keyword)
@@ -189,6 +249,138 @@ export const searchAPI = (keyword) => async (dispatch) => {
   }
 }
 
+/**
+ * @function getUserMusics
+ * @param {string} id User id
+ * @async
+ * @exports
+ * @description from user id, retrieve the list of ID whom author is specified ID
+ */
+export const getUserMusics = (id) => async (dispatch, getState) => {
+  const state = getState()
+  if (state.User?.token) return
+
+  try {
+    const res = await retrieveUserMusic(id, state.User.token)
+    dispatch(setMusicIDs(res.data))
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+/**
+ * @function createMusic
+ * @param {object} music Music object
+ * @param {callback} successCb callback upon success
+ * @description Creates a music if user authentified 
+ * @async
+ * @exports
+ */
+export const createMusic =  (music, successCb) => 
+  async (dispatch, getState) => {
+    dispatch(setNewMusicLoading(true))
+    const state = getState()
+        
+    // Set user token for axios
+    const config = {
+        headers: {
+          'Authorization': `Bearer ${state.User.token}`
+        }
+    }
+
+    try{
+      await axios.post('/api/music',{
+        title: music.title,
+        setup_code: music.setupCode,
+        step_code: music.stepCode,
+        can_fork: music.canFork,
+        private: music.isPrivate,
+        image: music.image,
+        fk_author: state.User.id,
+        bpm: music.bpm,
+        nb_steps: music.nbSteps,
+        samples: music.samples.map((sample)=>({title: sample.name, file: sample})),
+      }, config)
+      dispatch(setNewMusicLoading(false))
+      successCb();
+    } catch(err){
+      console.log(err.message)
+    }finally{
+      dispatch(setNewMusicLoading(false))
+    }
+    
+}
+
+
+/**
+ * @function updateMusic
+ * @param {object} music Music object
+ * @param {callback} successCb callback upon success
+ * @description Updates a music if user authentified 
+ * @async
+ * @exports
+ */
+export const updateMusic =  (music, successCb) => 
+  async (dispatch, getState) => {
+    dispatch(setNewMusicLoading(true))
+    const state = getState()
+        
+    // Set user token for axios
+    const config = {
+        headers: {
+          'Authorization': `Bearer ${state.User.token}`
+        }
+    }
+
+    try{
+      await axios.put(`api/music/update/${music.id}`,{
+        title: music.title,
+        setup_code: music.setupCode,
+        step_code: music.stepCode,
+        can_fork: music.canFork,
+        private: music.isPrivate,
+        image: music.image,
+        fk_author: state.User.id,
+        bpm: music.bpm,
+        nb_steps: music.nbSteps
+      }, config)
+      dispatch(setNewMusicLoading(false))
+      successCb();
+    } catch(err){
+      console.log(err.message)
+      dispatch(setNewMusicLoading(false))
+    }
+}
+
+
+/**
+ * @function updateMusic
+ * @param {object} id Music id
+ * @param {callback} successCb callback upon success
+ * @description Updates a music if user authentified 
+ * @async
+ * @exports
+ */
+export const deleteMusic =  (id, successCb) => 
+  async (dispatch, getState) => {
+    const state = getState()
+    // Set user token for axios
+    const config = {
+        headers: {
+          'Authorization': `Bearer ${state.User.token}`
+        }
+    }
+
+    try{
+      await axios.delete(`api/music/delete/${id}`, config)
+      successCb();
+    } catch(err){
+      console.log(err.message)
+    }
+    
+}
+
+
 // Export selectors
 export const selectMusics = (state) => state.MusicPack.musics
 export const selectCurrentList = (state) => {
@@ -198,6 +390,9 @@ export const selectCurrentList = (state) => {
 }
 export const selectSearchList = (state) => state.MusicPack.searchResult
 export const selectLoading = (state) => state.MusicPack.loading
+
+export const selectNewMusicError = (state) => state.MusicPack.newMusicError
+export const selectNewMusicLoading = (state) => state.MusicPack.newMusicLoading
 
 // Export default reducers
 export default musicPackSlice.reducer

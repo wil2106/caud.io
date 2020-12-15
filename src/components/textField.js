@@ -1,9 +1,11 @@
-import React from 'react';
-import Button from '@material-ui/core/Button';
+import React from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import InputBase from '@material-ui/core/InputBase';
 
+/**
+ * Constants
+ */
 const styles = theme => ({
   textField: {
     backgroundColor: "#252830",
@@ -17,7 +19,11 @@ const styles = theme => ({
   }
 })
 
-
+/**
+ * @function GreyTextField
+ * @param {Object} props React props
+ * @description Extension of MUI InputBase component
+ */
 function GreyTextField(props) {
   const {
     classes,
@@ -25,8 +31,10 @@ function GreyTextField(props) {
     onChange,
     isPassword,
     disabled,
+    value,
     ...rest
   } = props
+
 
   return (
     <Box m={1} style={{    flexGrow: 1    }}>
@@ -35,6 +43,7 @@ function GreyTextField(props) {
         placeholder={placeholder}
         onChange={onChange}
         type={isPassword ? 'password' : 'text'}
+        value={value}
         disabled={disabled}
         {...rest}
       />
@@ -42,5 +51,7 @@ function GreyTextField(props) {
   )
 }
 
-
+/**
+ * @exports
+ */
 export default withStyles(styles)(GreyTextField);

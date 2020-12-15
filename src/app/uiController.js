@@ -3,6 +3,8 @@ import { containers, pages } from './UIConstants'
 
 /**
  * Default state of UIController
+ * current controls the current container relative to the navbar
+ * curretnContainer controls the current container in the Explore container
  */
 const defaultState = {
   current: 'Explore',

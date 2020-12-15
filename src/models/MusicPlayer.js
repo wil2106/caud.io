@@ -13,13 +13,14 @@ export default class MusicPlayer {
       this.samplesVariablesUpdateCallback = {}
       this.setupCodeErrorCallBack = {}
       this.stepCodeErrorCallback = {}
+      this.musicID = {}
     }
   
-    async initialize(bpm = 60, nbSteps = 10, setupCode ='', stepCode ='', samples = {}){
+    async initialize(musicID = 0, bpm = 60, nbSteps = 10, setupCode ='', stepCode ='', samples = {}){
       //waiting for audio context to start
       await Tone.context.resume()
       //now we can use Tone
-    
+      this.musicID = musicID
       this.setupCode = setupCode
       this.stepCode = stepCode
       this.samples = samples
@@ -131,8 +132,14 @@ export default class MusicPlayer {
         this._samplesVariablesUpdateCallback = samplesVariablesUpdateCallback
     }
 
-    
-  
+    get musicID() {
+        return this._musicID
+    }
+
+    set musicID(musicID) {
+        this._musicID = musicID
+    }
+
     set nbSteps(nb){
         this.sequencer.dispose()
         this.sequencer = new Tone.Sequence((time, step)=>{

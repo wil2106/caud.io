@@ -2,13 +2,21 @@ const musicService = require('../services/music');
 const libraryService = require('../services/library');
 const sampleService = require('../services/sample');
 const userService = require('../services/user');
+const { GeneralError, BadRequest, NotFound } = require('../middlewares/errorClass');
 
 const {
   getPagination,
   getPaginationData,
 } = require('./../middlewares/pagination')
 
-function createMusic(req, res) {
+
+/**
+ * Création d'une musique
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+async function createMusic(req, res, next) {
   const {
     title,
     setup_code,
@@ -18,7 +26,11 @@ function createMusic(req, res) {
     image,
     fk_author,
     samples,
+    bpm,
+    nb_steps
   } = req.body
+
+  let imageBuffer = Buffer.from(image,"base64");
 
   let music = {
     title,
@@ -29,60 +41,103 @@ function createMusic(req, res) {
     step_code,
     can_fork,
     private,
-    image,
+    image: imageBuffer,
     fk_author,
+    bpm,
+    nb_steps
   }
 
+  
   musicService.add(music)
   .then(musicData => {
     samples.forEach((sample) => {
-      sampleService.add(sample).then((sampleData) => {
+      sampleService.add(sample)
+      .then((sampleData) => {
         libraryService.add({ musicId: musicData.id, sampleId: sampleData.id })
+        .catch(err => {
+          console.log(err)
+          next(new GeneralError('Internal Error'))
+          });
       })
+      .catch(err =>{
+        console.log(err)
+        next(new GeneralError('Internal Error'))
+      } );
     })
   })
   .then(data => res.send(data))
   .catch(err => {
-    console.log('**********ERROR RESULT****************');
-    console.log(err);
+    console.log(err)
+    next(new GeneralError('Internal Error'))
   });
+  
 }
 
-
-function deleteMusic(req, res) {
+/**
+ * Suppression d'une musique
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function deleteMusic(req, res, next) {
   libraryService.getUniqueSampleForMusic(parseInt(req.params.id))
   .then(result => {
     result[0].forEach(sample => {
       sampleService.deleteSample(sample.sampleId)
+      .catch(err => next(new GeneralError('Internal Error')));
     });
   })
-  .then(musicService.deleteMusic(req.params.id))
-  .then(libraryService.deleteLibraryForMusic(req.params.id))
-  .then(data => res.send(data));
+  .then(musicService.deleteMusic(req.params.id).catch(err => next(new GeneralError('Internal Error'))))
+  .then(libraryService.deleteLibraryForMusic(req.params.id).catch(err => next(new GeneralError('Internal Error'))))
+  .then(data => res.send(data))
+  .catch(err => next(new GeneralError('Internal Error')));
 }
 
-function updateMusic(req, res) {
+
+/**
+ * Mise à jour d'une musique
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function updateMusic(req, res, next) {
   let music = {
     title: req.body.title,
     setup_code: req.body.setup_code,
     step_code: req.body.step_code,
     can_fork: req.body.can_fork,
     private: req.body.private,
-    image: req.body.image
+    image: Buffer.from(req.body.image,"base64"),
+    bpm: req.body.bpm,
+    nb_steps: req.body.nb_steps
   }
-  musicService.updateMusic(music, req.params.id).then(data => res.send(data));
-
+  musicService.updateMusic(music, req.params.id)
+  .then(data => res.send(data))
+  .catch(err => {
+    console.log(err)
+    next(new GeneralError('Internal Error'))
+  }
+ );
+  /*
   req.body.samples.forEach(sample => {
     sampleService.update(
       {
       title: sample.title,
       file:  sample.file
       },
-      sample.id)    
+      sample.id)
+    .catch(err => next(new GeneralError('Internal Error')));    
   });
+  */
 }
 
-function like(req, res) {
+/**
+ * Ajout d'une mention "J'aime" à une musique
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function like(req, res, next) {
   let notification = {
     action: req.body.action,
     fk_user: req.body.fk_user,
@@ -91,14 +146,22 @@ function like(req, res) {
 
   }
   musicService.like(req.body.id).then(data => {
-    if(data==0) {
-      return res.status(404).send({error: 'No music with this id'});
-    }
-  });
-  musicService.notify(notification).then(data => res.send(data));
+    if(data==0)
+      return next(new NotFound('No music with this id'))
+    
+  })
+  .catch(err => next(new GeneralError('Internal Error')));
+  musicService.notify(notification).then(data => res.send(data))
+  .catch(err => next(new GeneralError('Internal Error')));
 }
 
-function fork(req, res) {
+/**
+ * Fork d'une musique
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function fork(req, res, next) {
   let notification = {
     action: req.body.action,
     fk_user: req.body.fk_user,
@@ -107,59 +170,97 @@ function fork(req, res) {
 
   }
   musicService.fork(req.body.id).then(data => {
-    if(data==0) {
-      return res.status(404).send({error: 'No music with this id'});
-    }
-  });
-  musicService.notify(notification).then(data => res.send(data));
+    if(data==0)
+      return next(new NotFound('No music with this id'))
+  })
+  .catch(err => next(new GeneralError('Internal Error')));
+  musicService.notify(notification).then(data => res.send(data))
+  .catch(err => next(new GeneralError('Internal Error')));
 }
 
-function listen(req, res) {
+/**
+ * Écoute d'une musique
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function listen(req, res, next) {
   musicService.listen(req.body.id).then(data => {
     if (data==0) {
      return res.status(404).send({error: 'No music with this id'});
     }
     res.status(204).send();
-   });
+   })
+   .catch(err => next(new GeneralError('Internal Error')));
 }
 
-function mostLike(req, res) {
+/**
+ * Récupère les musiques les plus aimées
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function mostLike(req, res, next) {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
   musicService.mostLike(limit, offset).then((data) => {
     const response = getPaginationData(data, page, limit)
     res.send(response)
-  })
+  }).catch(err => next(new GeneralError('Internal Error')));
 }
 
-function mostRecent(req, res) {
+/**
+ * Récupère les musiques les plus récentes
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function mostRecent(req, res, next) {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
   musicService.mostRecent(limit, offset).then((data) => {
     const response = getPaginationData(data, page, limit)
     res.send(response)
-  })
+  }).catch(err => next(new GeneralError('Internal Error')));
 }
 
-function mostFork(req, res) {
+/**
+ * Récupère les musiques les plus Fork
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function mostFork(req, res, next) {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
   musicService.mostFork(limit, offset).then((data) => {
     const response = getPaginationData(data, page, limit)
     res.send(response)
-  })
+  }).catch(err => next(new GeneralError('Internal Error')));
 }
 
-function mostListen(req, res) {
+/**
+ * Récupère les musiques les plus écoutées
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function mostListen(req, res, next) {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
   musicService.mostListen(limit, offset).then((data) => {
     const response = getPaginationData(data, page, limit)
     res.send(response)
-  })
+  }).catch(err => next(new GeneralError('Internal Error')));
 }
 
-function searchTitle(req, res) {
+/**
+ * Recherche de musiques par titre
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function searchTitle(req, res, next) {
   const { page, size } = req.query
   const { limit, offset } = getPagination(page, size)
   Promise.all([
@@ -167,19 +268,25 @@ function searchTitle(req, res) {
   ]).then((data) => {
     const response = getPaginationData(data, page, limit)
     res.send(response)
-  })
+  }).catch(err => next(new GeneralError('Internal Error')));
 }
 
-function getFullMusic(req, res) {
+/**
+ * Récupère une musique complète
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function getFullMusic(req, res, next) {
   let fullMusic = {
     music: null,
     samples: []
   }
   Promise.all([musicService.fullMusic(req.params.id), libraryService.getSamplesForMusic(req.params.id)])
   .then(data => {
-    if(data[0].length == 0) {
-      return res.status(404).send({error: 'the music is either non-existent or private'});
-    }
+    if(data[0].length == 0) 
+      return next(new NotFound('the music is either non-existent or private'))
+      
     fullMusic.music = data[0];
     Promise.all(data[1].map(x => x.dataValues.sampleId).map(s => {
       return sampleService.getById(s);
@@ -189,20 +296,26 @@ function getFullMusic(req, res) {
         fullMusic.samples.push(sampleData);
       })
       res.send(fullMusic);
-    });
-  });
+    }).catch(err => next(new GeneralError('Internal Error')));
+  }).catch(err => next(new GeneralError('Internal Error')));
 }
 
-function getMusicContent(req, res) {
+/**
+ * Récupère le contenue d'une musique
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+function getMusicContent(req, res, next) {
   let musicContent = {
     music: null,
     samples: []
   }
   Promise.all([musicService.musicContent(req.params.id), libraryService.getSamplesForMusic(req.params.id)])
   .then(data => {
-    if(data[0].length == 0) {
-      return res.status(404).send({error: 'the music is either non-existent or private'});
-    }
+    if(data[0].length == 0)
+      return next(new NotFound('the music is either non-existent or private'))
+
     musicContent.music = data[0];
     Promise.all(data[1].map(x => x.dataValues.sampleId).map(s => {
       return sampleService.getById(s);
@@ -212,35 +325,55 @@ function getMusicContent(req, res) {
         musicContent.samples.push(sampleData);
       })
       res.send(musicContent);
-    });
-  });
+    }).catch(err => next(new GeneralError('Internal Error')));
+  }).catch(err => next(new GeneralError('Internal Error')));
 }
 
-function getListOfMusic(req, res) {
+/**
+ * Récupère plusieurs musiques dans une liste
+ * @param { import('express').Request } req
+ * @param { import('express').Response } res
+ * @param { function } next
+ */
+async function getListOfMusic(req, res) {
   listMusic = []
-  if(req.body.ids.length == 0) { return res.status(404).send("no id provided") }
-  Promise.all(req.body.ids.map( id => {
-    musicService.fullMusic(id)
-    .then(music => {
-      if(music.length == 0) {
-        return res.status(404).send("one of the musics is either non-existent or private")
-      }
-      if(music[0].dataValues.fk_author == null) {
-        return res.status(404).send("author of one of the music is not specified")
-      }
-      userService.getUserLoginById(music[0].dataValues.fk_author)
-      .then(login => {
-        music[0].dataValues.authorLogin = login.login
-        listMusic.push(music[0])
-        if( listMusic.length == req.body.ids.length ) {
-          return res.send(listMusic)
-        } 
-      })
-      .catch(error => res.send(error));
+  if(!req.body.ids || req.body.ids.length == 0) { return res.status(404).send("no id provided") }
+  // Promise.all(req.body.ids.map( id => {
+  //   musicService.fullMusic(id)
+  //   .then(music => {
+  //     if(music.length == 0) {
+  //       return res.status(404).send("one of the musics is either non-existent or private")
+  //     }
+  //     if(music[0].dataValues.fk_author == null) {
+  //       return res.status(404).send("author of one of the music is not specified")
+  //     }
+  //     userService.getUserLoginById(music[0].dataValues.fk_author)
+  //     .then(login => {
+  //       music[0].dataValues.authorLogin = login.login
+  //       listMusic.push(music[0])
+  //       if( listMusic.length == req.body.ids.length ) {
+  //         return res.send(listMusic)
+  //       } 
+  //     })
+  //     .catch(error => res.send(error));
+  //   })
+  //   .catch(error => res.send(error));
+  // }))
+  // .catch(error => res.send(error));
+
+  try {
+    const data = await Promise.all(req.body.ids.map(async (id) => {
+      const musicData = await musicService.fullMusic(id)
+      if (!musicData || !musicData.length) return
+      return musicData[0]
+    }))
+    if (!data || !data.length) res.status(409).send({ message: 'Nothing found' })
+    return res.status(200).send({
+      data: data
     })
-    .catch(error => res.send(error));
-  }))
-  .catch(error => res.send(error));
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 

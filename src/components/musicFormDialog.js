@@ -18,6 +18,9 @@ import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { useSelector, useDispatch } from 'react-redux'
+import { createMusic, updateMusic, setNewMusicError } from '../app/musicPackSlice'
+import { selectNewMusicError, selectNewMusicLoading } from '../app/musicPackSlice'
+import { useHistory } from 'react-router-dom'
 
 const styles = theme => ({
   media: {
@@ -26,33 +29,39 @@ const styles = theme => ({
   },
   input: {
     display: 'none',
-  }
+  },
+  colorPrimary: {
+    backgroundColor: 'white',
+  },
+  barColorPrimary: {
+    backgroundColor: '#47CF73',
+  },
 });
 
 
 function FormDialog(props) {
-
-  const loading = false//useSelector(null)
-  const error = 'test'//useSelector(null)
  
-  const { closeDialog, classes, openSuccessSnackBar, setupCode, stepCode, bpm, nbSteps, samples} = props
+  const { closeDialog, classes, openSuccessSnackBar, setupCode, stepCode, bpm, nbSteps, samples, mode, musicObject} = props
 
-  console.log(setupCode, stepCode, bpm, nbSteps, samples)
+  
 
-  const [title, setTitle] = useState('');
-  const [image, setImage] = useState('');
-  const [canFork, setCanFork] = useState(true);
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [title, setTitle] = useState(musicObject ? musicObject.title : '')
+  const [image, setImage] = useState(musicObject ? musicObject.image : '')
+  const [canFork, setCanFork] = useState(musicObject ? musicObject.can_fork : true)
+  const [isPrivate, setIsPrivate] = useState(musicObject ? musicObject.private : false);
+
+  const history = useHistory()
+  const dispatch = useDispatch()
+  const loading = useSelector(selectNewMusicLoading)
+  const error = useSelector(selectNewMusicError)
 
   const handleClose = () => {
     closeDialog()
   }
 
-  const handleImageChange = (files) => {
-    let url = URL.createObjectURL(files[0])
-    console.log(url)
-    setImage(url)
-    //setImage()
+  const handleImageChange = async (files) => {
+    let base64 = await createBase64String(files[0])
+    setImage(base64)
   }
 
   const handleTitleChange = (e) => {
@@ -71,22 +80,71 @@ function FormDialog(props) {
     setImage('')
   }
 
+  const handlePost = async () => {
+    if(title.trim() === ""){
+      dispatch(setNewMusicError('Music must have a title'))
+      return;
+    }
+    let formattedImageString = removeMetaData(image)
+    let music = {
+      title: title, 
+      image: formattedImageString, 
+      canFork: canFork, 
+      isPrivate: isPrivate, 
+      bpm: bpm, 
+      nbSteps: nbSteps, 
+      setupCode: setupCode, 
+      stepCode: stepCode, 
+      samples: samples
+    }
+    dispatch(createMusic(music, ()=>{
+      closeDialog()
+      history.push('/')
+    }))
+  }
+
+
+  const handleSave = async () => {
+    if(title.trim() === ""){
+      dispatch(setNewMusicError('Music must have a title'))
+      return;
+    }
+    let formattedImageString = removeMetaData(image)
+    let music = {
+      title: title, 
+      image: formattedImageString, 
+      canFork: canFork, 
+      isPrivate: isPrivate, 
+      bpm: bpm, 
+      nbSteps: nbSteps, 
+      setupCode: setupCode, 
+      stepCode: stepCode, 
+      id: musicObject.id
+    }
+    dispatch(updateMusic(music, ()=>{
+      closeDialog()
+      history.push('/')
+    }))
+    
+  }
+
   
   return (
     <Dialog open={true} aria-labelledby="form-dialog-title" fullWidth={true} 
        PaperProps={{style: {backgroundColor: '#131417'}}}
     >
-      <DialogTitle><Box color="white" display="flex">New music</Box></DialogTitle>
+      <DialogTitle><Box color="white" display="flex">{mode === "edit" ? "Edit music" : "New music" }</Box></DialogTitle>
       <DialogContent>
         <Box m={1} display="flex">
           <Box>
-            <Box style={{backgroundColor:"#1E1F26"}}>
-              <CardMedia
-                className={classes.media}
-                image={image}
-                title="Music image"
-              />
-            </Box>
+              {
+                image === "" ?
+                <Box className={classes.media} style={{backgroundColor:"#1E1F26", color: "#AAAEBC"}} display="flex" alignItems="center" justifyContent="center">
+                  No image
+                </Box>
+                :
+                <img src={image} alt="Music image" className={classes.media}></img>
+              }
             <Box display="flex" alignItems="center" m={1} justifyContent="center">
               
               {
@@ -111,7 +169,7 @@ function FormDialog(props) {
             </Box>
           </Box>
           <Box flexGrow={1}>
-            <TextField onChange = {handleTitleChange} placeholder="Title" disabled={loading}/>
+            <TextField onChange = {handleTitleChange} placeholder="Title" disabled={loading} value={title}/>
             <FormControlLabel
                 value="start"
                 control={<Checkbox style={{color: 'white'}} checked={isPrivate} onChange={handleIsPrivateChange}/>}
@@ -135,13 +193,36 @@ function FormDialog(props) {
         {error && <CustomAlert text={error}/>}
       </DialogContent>
       <DialogActions>
-          <GreyButton onClick={closeDialog} text="CANCEL" disabled={false}/>
-          <GreenButton onClick={null} text="POST" disabled={false}/>
+          <GreyButton onClick={handleClose} text="CANCEL" disabled={loading}/>
+          {
+            mode === "edit" ?
+            <GreenButton onClick={handleSave} text="Save" disabled={loading}/>
+            :
+            <GreenButton onClick={handlePost} text="POST" disabled={loading}/>
+          }
+          
       </DialogActions>
       {loading && <LinearProgress classes={{colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary}}/>}
     </Dialog>
   );
 }
+
+
+function createBase64String(fileObject){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      resolve(e.target.result)
+    }
+    reader.readAsDataURL(fileObject)
+    reader.onerror = error => reject(error);
+  })
+}
+
+function removeMetaData(string){
+  return string.split(',')[1]
+}
+
 
 
 export default withStyles(styles)(FormDialog);

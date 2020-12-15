@@ -38,11 +38,12 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { deleteMusic } from '../app/musicPackSlice'
 
 import GreenButton from './../components/greenButton'
 import GreyButton from './../components/greyButton'
 
-import NewMusicDialog from '../components/newMusicFormDialog'
+import NewMusicDialog from '../components/musicFormDialog'
 import SignUpFormDialog from './../components/signUpFormDialog'
 import LoginFormDialog from './../components/loginFormDialog'
 
@@ -50,12 +51,16 @@ import Snackbar from '@material-ui/core/Snackbar'
 
 import ProfileIndicator from '../components/profileIndicator'
 
-import { selectLogin } from '../app/userSlice'
+import { useLocation } from 'react-router-dom'
+
+import { selectLogin, selectID } from '../app/userSlice'
 
 import "ace-builds/src-noconflict/mode-ruby";
 import "ace-builds/src-noconflict/theme-monokai";
 
 import MusicPlayer from '../models/MusicPlayer'
+
+import { useHistory } from 'react-router-dom'
 
 const drawerWidth = 350;
 
@@ -86,7 +91,9 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
-    textAlign: "left"
+    textAlign: "left",
+    display: "flex",
+    alignItems: "center"
   },
   greenButton: {
     backgroundColor:'#47CF73'
@@ -139,12 +146,22 @@ const useStyles = makeStyles((theme) => ({
   },
   input: {
     display: 'none',
+  },
+  musicImage: {
+    height: 50,
+    width: 50
   }
 }));
 let musicPlayer = new MusicPlayer();
 
 export default function Editor(props) {
+  
+
+  const location = useLocation();
   const classes = useStyles();
+
+  const history = useHistory()
+  const dispatch = useDispatch()
   
   const [openAudioContextDialog, setOpenAudioContextDialog] = useState(false);
 
@@ -155,6 +172,9 @@ export default function Editor(props) {
   const [step, setStep] = useState(0);
   const [synthVariables, setSynthVariables] = useState([]);
   const [sampleVariables, setSampleVariables] = useState([]);
+
+  const [mode, setMode] = useState((location.state && location.state.mode) ? location.state.mode : 'create');
+  const [musicObject, setMusicObject] = useState((location.state && location.state.musicObject) ? location.state.musicObject : '');
 
   const [isReady, setIsReady] = useState(false);
 
@@ -168,7 +188,7 @@ export default function Editor(props) {
 
   const [selectedSample, setSelectedSample] = useState();
 
-  const [openNewMusicDialog, setOpenNewMusicDialog] = React.useState(false)
+  const [openMusicDialog, setOpenMusicDialog] = React.useState({open: false, mode:'', musicObject: ''})
 
   const [openSignUpDialog, setOpenSignUpDialog] = React.useState(false)
   const [openLoginDialog, setOpenLoginDialog] = React.useState(false)
@@ -180,6 +200,7 @@ export default function Editor(props) {
 
 
   const userLogin = useSelector(selectLogin)
+  const userID = useSelector(selectID)
 
   useEffect(() => {
     if(!musicPlayer.isAudioContextStarted()){
@@ -192,19 +213,39 @@ export default function Editor(props) {
     musicPlayer.setupCodeErrorCallBack = handleSetupCodeErrorChange
     musicPlayer.stepCodeErrorCallBack = handleStepCodeErrorChange
 
-    setTimeout(()=>{
-      let theNbSteps = 10;
-      let theBpm = 80;
-      let theSetupCode = 'this.synths.amsynth = new ToneJS.PluckSynth().toMaster()'
-      let theStepCode = 'this.synths.amsynth.triggerAttackRelease("C4", "32n")'
-      musicPlayer.initialize(theBpm, theNbSteps, theSetupCode, theStepCode)
-      setBpm(theBpm)
-      setNbSteps(theNbSteps)
-      setSetupCode(theSetupCode)
-      setStepCode(theStepCode)
-      setIsReady(true)
-    }, 2000); 
+    let id
+    let theNbSteps
+    let theBpm
+    let theSetupCode
+    let theStepCode
+
+    if(musicObject){
+      id = musicObject.id
+      theNbSteps = musicObject.nb_steps
+      theBpm = musicObject.bpm
+      theSetupCode = musicObject.setup_code
+      theStepCode = musicObject.step_code
+    }else{
+      id = 0
+      theNbSteps = 10
+      theBpm = 80
+      theSetupCode = ''
+      theStepCode = ''
+    }
+
+    musicPlayer.initialize(0, theBpm, theNbSteps, theSetupCode, theStepCode)
+    setBpm(theBpm)
+    setNbSteps(theNbSteps)
+    setSetupCode(theSetupCode)
+    setStepCode(theStepCode)
+    setIsReady(true)
   }, [])
+
+
+  useEffect(() => {
+    let mode = userID === musicObject.fk_author ? 'edit' : 'view'
+    setMode(mode)
+  }, [userID])
 
   const handleStartAudioContextAndCloseDialog = () => {
     musicPlayer.startAudioContext()
@@ -291,12 +332,16 @@ export default function Editor(props) {
     setSelectedSample(samples[index]);
   }
 
-  const handleCloseNewMusicDialog = () => {
-    setOpenNewMusicDialog(false)
+  const handleCloseMusicDialog = () => {
+    setOpenMusicDialog({open: false, mode:'', musicObject: ''})
   }
 
   const handleOpenNewMusicDialog = () => {
-    setOpenNewMusicDialog(true)
+    setOpenMusicDialog({open: true, mode:'create', musicObject: ''})
+  }
+
+  const handleOpenEditMusicDialog = () => {
+    setOpenMusicDialog({open: true, mode:'edit', musicObject: musicObject})
   }
 
   const handleCloseSignUpDialog = () => {
@@ -323,6 +368,9 @@ export default function Editor(props) {
     setSuccessSnackBarStatus({ open: false, message: '' })
   }
 
+  const handleDelete = () => {
+    dispatch(deleteMusic(musicObject.id, ()=> history.push('/')))
+  }
 
   return (
     <div className={classes.root}>
@@ -334,12 +382,32 @@ export default function Editor(props) {
               </IconButton>
           </Link>
           <Box className={classes.title}>
-            <IconButton style={{color:'white'}}/>
+            {
+              musicObject && (
+                <React.Fragment>
+                  <Box><img src={musicObject.image} alt="Music image" className={classes.musicImage}></img></Box>
+                  <Box mx={1}>
+                    <Box fontWeight="fontWeightBold">{musicObject.title}</Box>
+                    <Box color="#AAAEBC">By {musicObject.login}</Box>
+                  </Box>
+                </React.Fragment>
+              )
+            }
           </Box>
           {userLogin ? (
             <Box display="flex" alignItems="center">
-              <GreenButton onClick={handleOpenNewMusicDialog} text="CREATE" />
-              <GreyButton onClick={null} text="SHARE" />
+              { mode === "edit" && (
+                <React.Fragment>
+                  <GreenButton onClick={handleOpenEditMusicDialog} text="EDIT" />
+                  <GreyButton onClick={handleDelete} text="DELETE" />
+                </React.Fragment>
+              )}
+              { mode === "view" && (
+                <React.Fragment>
+                  <GreenButton onClick={null} text="FORK" />
+                </React.Fragment>
+              )}
+              { mode === "create" && <GreenButton onClick={handleOpenNewMusicDialog} text="CREATE" />}              
               <ProfileIndicator />
             </Box>
           ) : (
@@ -366,13 +434,20 @@ export default function Editor(props) {
           <Box display="flex" alignItems="center" mt={1}>
             <Box fontSize="h6.fontSize" style={{color: "#AAAEBC", fontWeight: "fontWeightRegular", marginLeft: 15}} 
             flexGrow={1} justifyContent="flex-start" display="flex">Files</Box>
-            <input accept="audio/*" className={classes.input} id="files" type="file" onChange={ (e) => handleSampleAdd(e.target.files) }
-            webkitfile="true" multiple/>
-            <label htmlFor="files">
-              <IconButton color="primary" component="span">
-                <SystemUpdateAltIcon style={{ color: '#AAAEBC'}}/>
-              </IconButton>
-            </label>
+            {
+              mode !== "view" && (
+                <React.Fragment>
+                  <input accept="audio/*" className={classes.input} id="files" type="file" onChange={ (e) => handleSampleAdd(e.target.files) }
+                  webkitfile="true" multiple/>
+                  <label htmlFor="files">
+                    <IconButton color="primary" component="span">
+                      <SystemUpdateAltIcon style={{ color: '#AAAEBC'}}/>
+                    </IconButton>
+                  </label>
+                </React.Fragment>
+              )
+            }
+            
           </Box>
           <Divider />
           <List className={classes.sampleList}>
@@ -423,11 +498,11 @@ export default function Editor(props) {
                   </Box>
                 <Box display="flex">
                   <Box mx={1} style={{color: "#AAAEBC", fontWeight: "fontWeightRegular"}}>Bpm</Box>
-                  <input type="number" className={classes.numberInput} min="0" max="300" value={bpm} onChange={handleBpmChange}/>
+                  <input type="number" className={classes.numberInput} min="0" max="300" value={bpm} onChange={handleBpmChange} disabled={mode === "view"}/>
                 </Box>
                 <Box display="flex">
                   <Box mx={1} style={{color: "#AAAEBC", fontWeight: "fontWeightRegular"}}>Steps</Box>
-                  <input type="number" className={classes.numberInput} min="0" max="500" value={nbSteps} onChange={handleNbStepsChange}/>
+                  <input type="number" className={classes.numberInput} min="0" max="500" value={nbSteps} onChange={handleNbStepsChange} disabled={mode === "view"}/>
                 </Box>
                 </Box>
                 <AceEditor
@@ -437,6 +512,7 @@ export default function Editor(props) {
                   onChange={handleSetupCodeChange}
                   editorProps={{ $blockScrolling: true }}
                   value={setupCode}
+                  readOnly={mode === "view"}
                 />
                 {setupCodeError && <Box className={classes.editorErrorConsole}>{setupCodeError}</Box>}
               </Box>
@@ -464,22 +540,28 @@ export default function Editor(props) {
                   onChange={handleStepCodeChange}
                   editorProps={{ $blockScrolling: true }}
                   value={stepCode}
+                  readOnly={mode === "view"}
                 />
                 {stepCodeError && <Box className={classes.editorErrorConsole}>{stepCodeError}</Box>}
-                <Box className={classes.editorAvailableVariables}>
-                  <Box style={{color: "#AAAEBC"}} justifyContent="flex-start" display="flex">Available variables:</Box>
-                  <Box display="flex" alignItems="center">
-                    <Box borderRadius={5} style={{color: "white", backgroundColor: "#CC7847", margin: 2, padding: 4}}>step</Box>
-                    {
-                      synthVariables.map((synthVariable, index)=>
-                      <Box key={`${index}-${synthVariable}`} borderRadius={5} style={{color: "white", backgroundColor: "#5F47CC", margin: 2, padding: 4}}>{synthVariable}</Box>)
-                    }
-                    {
-                      sampleVariables.map((sampleVariable, index)=>
-                      <Box key={`${index}-${sampleVariable}`} borderRadius={5} style={{color: "white", backgroundColor: "#CC4747", margin: 2, padding: 4}}>{sampleVariable}</Box>)
-                    }
+                {
+                  mode !== "view" && (
+                  <Box className={classes.editorAvailableVariables}>
+                    <Box style={{color: "#AAAEBC"}} justifyContent="flex-start" display="flex">Available variables:</Box>
+                    <Box display="flex" alignItems="center">
+                      <Box borderRadius={5} style={{color: "white", backgroundColor: "#CC7847", margin: 2, padding: 4}}>step</Box>
+                      {
+                        synthVariables.map((synthVariable, index)=>
+                        <Box key={`${index}-${synthVariable}`} borderRadius={5} style={{color: "white", backgroundColor: "#5F47CC", margin: 2, padding: 4}}>{synthVariable}</Box>)
+                      }
+                      {
+                        sampleVariables.map((sampleVariable, index)=>
+                        <Box key={`${index}-${sampleVariable}`} borderRadius={5} style={{color: "white", backgroundColor: "#CC4747", margin: 2, padding: 4}}>{sampleVariable}</Box>)
+                      }
+                    </Box>
                   </Box>
-                </Box>
+                  )
+                }
+                
               </Box>
             </React.Fragment>
             :
@@ -504,9 +586,11 @@ export default function Editor(props) {
           </DialogActions>
         </Dialog>
       </div>
-      {openNewMusicDialog && (
+      {openMusicDialog.open && (
         <NewMusicDialog
-          closeDialog={handleCloseNewMusicDialog}
+          closeDialog={handleCloseMusicDialog}
+          mode={openMusicDialog.mode}
+          musicObject={openMusicDialog.musicObject}
           setupCode={setupCode}
           stepCode={stepCode}
           bpm={bpm}
