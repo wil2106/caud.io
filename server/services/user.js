@@ -3,6 +3,7 @@ const Music = require('../models').Music
 
 const addUser = (user) => Users.create(user)
 const getUserByID = (id) => Users.findOne({ where: { id } })
+const getUserByLogin = (login) => Users.findOne({ where: { login: login } })
 
 const getUserMusics = (id, limit, offset) =>
   Music.findAll({
@@ -23,11 +24,17 @@ const getUserLoginById = (id_) =>
     where: { id: id_ },
   })
 
-const updateUser = (user, id_) => Users.update(user, { where: { id: id_ } })
+
+
+const updateUser = (user, id_) => Users.update(
+    user,
+    {where: {id: id_}}
+);
 
 module.exports = {
   addUser,
   getUserByID,
+  getUserByLogin,
   deleteUser,
   updateUser,
   getUserLoginById,

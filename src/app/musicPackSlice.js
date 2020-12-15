@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import axios from 'axios'
 import {
   retrieveMostList,
   retrieveMusicObject,
@@ -6,7 +7,7 @@ import {
   retrieveUserMusic,
   searchMusic,
 } from '../api/musicPack'
-import { createBlobURL } from '../utils'
+import { createBlobURL, imageBufferToBase64 } from '../utils'
 import { containers } from './UIConstants'
 import _ from 'lodash'
 import { setMusicIDs } from './userSlice'
@@ -29,6 +30,8 @@ const defaultMusicPack = {
   mostListenedIDsPage: 0,
   mostForkedIDsPage: 0,
   searchResultPage: 0,
+  newMusicError: '',
+  newMusicLoading: false
 }
 
 // Create MusicPack redux slice
@@ -83,6 +86,12 @@ export const musicPackSlice = createSlice({
     resetSearchList: (state) => {
       state.searchResult = []
     },
+    setNewMusicError: (state, action) => {
+      state.newMusicError = action.payload
+    },
+    setNewMusicLoading: (state, action) => {
+      state.newMusicLoading = action.payload
+    },
   },
 })
 
@@ -96,6 +105,8 @@ export const {
   setPages,
   addToSearch,
   resetSearchList,
+  setNewMusicError,
+  setNewMusicLoading
 } = musicPackSlice.actions
 
 // Export thunks
@@ -155,9 +166,7 @@ export const retrieveMusics = (ids) => async (dispatch) => {
   const blobedArray = await Promise.all(
     result.data.map(async (element) => {
       if (element.image) {
-        const url = `data:image/png;base64,${element.image}`
-        const blob = await (await fetch(url)).blob()
-        element.image = createBlobURL(blob)
+        element.image = `data:image/png;base64,${element.image}` 
       }
       return element
     })
@@ -206,10 +215,9 @@ const retrieveAPIMusic = async (listName, page, dispatch) => {
     const blobedArray = await Promise.all(
       result.data.map(async (element) => {
         if (element.image) {
-          const url = `data:image/png;base64,${element.image}`
-          const blob = await (await fetch(url)).blob()
-          element.image = createBlobURL(blob)
+          element.image = `data:image/png;base64,${element.image}` 
         }
+        
         return element
       })
     )
@@ -260,6 +268,119 @@ export const getUserMusics = (id) => async (dispatch, getState) => {
   }
 }
 
+/**
+ * @function createMusic
+ * @param {object} music Music object
+ * @param {callback} successCb callback upon success
+ * @description Creates a music if user authentified 
+ * @async
+ * @exports
+ */
+export const createMusic =  (music, successCb) => 
+  async (dispatch, getState) => {
+    dispatch(setNewMusicLoading(true))
+    const state = getState()
+        
+    // Set user token for axios
+    const config = {
+        headers: {
+          'Authorization': `Bearer ${state.User.token}`
+        }
+    }
+
+    try{
+      await axios.post('/api/music',{
+        title: music.title,
+        setup_code: music.setupCode,
+        step_code: music.stepCode,
+        can_fork: music.canFork,
+        private: music.isPrivate,
+        image: music.image,
+        fk_author: state.User.id,
+        bpm: music.bpm,
+        nb_steps: music.nbSteps,
+        samples: music.samples.map((sample)=>({title: sample.name, file: sample})),
+      }, config)
+      dispatch(setNewMusicLoading(false))
+      successCb();
+    } catch(err){
+      console.log(err.message)
+    }finally{
+      dispatch(setNewMusicLoading(false))
+    }
+    
+}
+
+
+/**
+ * @function updateMusic
+ * @param {object} music Music object
+ * @param {callback} successCb callback upon success
+ * @description Updates a music if user authentified 
+ * @async
+ * @exports
+ */
+export const updateMusic =  (music, successCb) => 
+  async (dispatch, getState) => {
+    dispatch(setNewMusicLoading(true))
+    const state = getState()
+        
+    // Set user token for axios
+    const config = {
+        headers: {
+          'Authorization': `Bearer ${state.User.token}`
+        }
+    }
+
+    try{
+      await axios.put(`api/music/update/${music.id}`,{
+        title: music.title,
+        setup_code: music.setupCode,
+        step_code: music.stepCode,
+        can_fork: music.canFork,
+        private: music.isPrivate,
+        image: music.image,
+        fk_author: state.User.id,
+        bpm: music.bpm,
+        nb_steps: music.nbSteps
+      }, config)
+      dispatch(setNewMusicLoading(false))
+      successCb();
+    } catch(err){
+      console.log(err.message)
+      dispatch(setNewMusicLoading(false))
+    }
+}
+
+
+/**
+ * @function updateMusic
+ * @param {object} id Music id
+ * @param {callback} successCb callback upon success
+ * @description Updates a music if user authentified 
+ * @async
+ * @exports
+ */
+export const deleteMusic =  (id, successCb) => 
+  async (dispatch, getState) => {
+    const state = getState()
+    // Set user token for axios
+    const config = {
+        headers: {
+          'Authorization': `Bearer ${state.User.token}`
+        }
+    }
+
+    try{
+      await axios.delete(`api/music/delete/${id}`, config)
+      successCb();
+    } catch(err){
+      console.log(err.message)
+    }
+    
+}
+
+
 // Export selectors
 export const selectMusics = (state) => state.MusicPack.musics
 export const selectCurrentList = (state) => {
@@ -269,6 +390,9 @@ export const selectCurrentList = (state) => {
 }
 export const selectSearchList = (state) => state.MusicPack.searchResult
 export const selectLoading = (state) => state.MusicPack.loading
+
+export const selectNewMusicError = (state) => state.MusicPack.newMusicError
+export const selectNewMusicLoading = (state) => state.MusicPack.newMusicLoading
 
 // Export default reducers
 export default musicPackSlice.reducer

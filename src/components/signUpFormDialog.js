@@ -108,7 +108,6 @@ function FormDialog(props) {
           </Box>
           <Box flexGrow={1}>
             <TextField
-              disable
               onChange={handleLoginChange}
               placeholder="login"
               disabled={loading}

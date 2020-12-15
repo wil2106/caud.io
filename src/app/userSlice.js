@@ -8,6 +8,7 @@ import { RandomColor } from '../components/hooks/useRandomColor'
 const color = RandomColor()
 const defaultUser = {
   login: '',
+  id: '',
   description: '',
   token: '',
   userMusicsIDs: [],
@@ -42,9 +43,10 @@ export const userSlice = createSlice({
       state.login = action.payload
     },
     setUserData: (state, action) => {
-      const { login, token } = action.payload
+      const { login, token, id } = action.payload
       state.login = login
       state.token = token
+      state.id = id
     },
     setMusicIDs: (state, action) => {
       state.userMusicsIDs.push(...action.payload)
@@ -156,6 +158,7 @@ export const logout = () => (dispatch) => {
 
 // Export selectors
 export const selectLogin = (state) => state.User.login
+export const selectID = (state) => state.User.id
 export const selectLoginLoading = (state) => state.User.loginLoading
 export const selectSignUpLoading = (state) => state.User.signUpLoading
 export const selectLoginError = (state) => state.User.loginError

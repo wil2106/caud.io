@@ -31,8 +31,10 @@ function GreyTextField(props) {
     onChange,
     isPassword,
     disabled,
+    value,
     ...rest
   } = props
+
 
   return (
     <Box m={1} style={{    flexGrow: 1    }}>
@@ -41,6 +43,7 @@ function GreyTextField(props) {
         placeholder={placeholder}
         onChange={onChange}
         type={isPassword ? 'password' : 'text'}
+        value={value}
         disabled={disabled}
         {...rest}
       />

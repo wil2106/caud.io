@@ -41,32 +41,31 @@ function login(req, res, next) {
  * @param { import('express').Response } res
  * @param { function } next
  */
-function register(req, res, next) {
-  const { login, password } = req.body
-  // Upon empty body, return error to middleware
-  if (!req.body || !login || !password)
-    return next(new BadRequest('Incomplete credentials.'))
-  return userService
-    .getUserByLogin(req.body.login || '')
-    .then((exists) => {
-      if (exists) {
-        return res.status(409).send({
-          success: false,
-          message:
-            'Registration failed. User with this login already registered.',
-        })
-      }
-      let user = {
-        login: req.body.login,
-        password: bcrypt.hashSync(req.body.password, config.saltRounds),
-      }
-      return userService
-        .addUser(user)
-        .then(() => res.send({ success: true }))
-        .catch((err) => next(new GeneralError('Internal Error')))
+function register(req, res, next){
+     const { login, password } = req.body
+     if (!req.body || !login || !password ) return next(new BadRequest('Incomplete credentials.'))
+    return userService.getUserByLogin(req.body.login)
+    .then(exists => {
+         if (exists){
+              return res.status(409).send({
+                  success: false,
+                  message: 'Registration failed. User with this login already registered.'
+              });
+         }
+         let user = {
+              login: req.body.login,
+              password: bcrypt.hashSync(req.body.password, config.saltRounds)
+          }
+         return userService.addUser(user)
+         .then(() => res.send({success: true}))
+         .catch(err => {
+               next(new GeneralError('Internal Error'))
+         });
     })
-    .catch((err) => next(new GeneralError('Internal Error')))
-}
+    .catch(err =>{
+          next(new GeneralError('Internal Error'))
+    });
+};
 
 /**
  * @exports

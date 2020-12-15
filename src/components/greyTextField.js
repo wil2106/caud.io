@@ -14,7 +14,7 @@ const BACKGROUND_HOVERED = '#393c45'
  * @exports
  * @description SearchBar component
  */
-export default function SearchBar(props) {
+export default function GreyTextField(props) {
   const { placeHolder, handleChange } = props
   /**
    * State

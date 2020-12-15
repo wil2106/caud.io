@@ -9,6 +9,7 @@ router.post('/music/fork', authMiddleware.checkAuth, musicController.fork)
 router.post('/music', authMiddleware.checkAuth, musicController.createMusic)
 router.post('/music/listen', authMiddleware.checkAuth, musicController.listen)
 
+
 router.get('/music/list', musicController.getListOfMusic)
 router.get('/music/full/:id', musicController.getFullMusic)
 router.get('/music/mostLike', musicController.mostLike)
@@ -29,5 +30,8 @@ router.put(
   authMiddleware.checkAuth,
   musicController.updateMusic
 )
+
+
+
 
 module.exports = router

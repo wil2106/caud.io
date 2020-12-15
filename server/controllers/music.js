@@ -15,7 +15,7 @@ const {
  * @param { import('express').Response } res
  * @param { function } next
  */
-function createMusic(req, res, next) {
+async function createMusic(req, res, next) {
   const {
     title,
     setup_code,
@@ -25,7 +25,11 @@ function createMusic(req, res, next) {
     image,
     fk_author,
     samples,
+    bpm,
+    nb_steps
   } = req.body
+
+  let imageBuffer = Buffer.from(image,"base64");
 
   let music = {
     title,
@@ -36,26 +40,36 @@ function createMusic(req, res, next) {
     step_code,
     can_fork,
     private,
-    image,
+    image: imageBuffer,
     fk_author,
+    bpm,
+    nb_steps
   }
 
-  musicService
-    .add(music)
-    .then((musicData) => {
-      samples.forEach((sample) => {
-        sampleService
-          .add(sample)
-          .then((sampleData) => {
-            libraryService
-              .add({ musicId: musicData.id, sampleId: sampleData.id })
-              .catch((err) => next(new GeneralError('Internal Error')))
-          })
-          .catch((err) => next(new GeneralError('Internal Error')))
+  
+  musicService.add(music)
+  .then(musicData => {
+    samples.forEach((sample) => {
+      sampleService.add(sample)
+      .then((sampleData) => {
+        libraryService.add({ musicId: musicData.id, sampleId: sampleData.id })
+        .catch(err => {
+          console.log(err)
+          next(new GeneralError('Internal Error'))
+          });
       })
+      .catch(err =>{
+        console.log(err)
+        next(new GeneralError('Internal Error'))
+      } );
     })
-    .then((data) => res.send(data))
-    .catch((err) => next(new GeneralError('Internal Error')))
+  })
+  .then(data => res.send(data))
+  .catch(err => {
+    console.log(err)
+    next(new GeneralError('Internal Error'))
+  });
+  
 }
 
 /**
@@ -103,24 +117,28 @@ function updateMusic(req, res, next) {
     step_code: req.body.step_code,
     can_fork: req.body.can_fork,
     private: req.body.private,
-    image: req.body.image,
+    image: Buffer.from(req.body.image,"base64"),
+    bpm: req.body.bpm,
+    nb_steps: req.body.nb_steps
   }
-  musicService
-    .updateMusic(music, req.params.id)
-    .then((data) => res.send(data))
-    .catch((err) => next(new GeneralError('Internal Error')))
-
-  req.body.samples.forEach((sample) => {
-    sampleService
-      .update(
-        {
-          title: sample.title,
-          file: sample.file,
-        },
-        sample.id
-      )
-      .catch((err) => next(new GeneralError('Internal Error')))
-  })
+  musicService.updateMusic(music, req.params.id)
+  .then(data => res.send(data))
+  .catch(err => {
+    console.log(err)
+    next(new GeneralError('Internal Error'))
+  }
+ );
+  /*
+  req.body.samples.forEach(sample => {
+    sampleService.update(
+      {
+      title: sample.title,
+      file:  sample.file
+      },
+      sample.id)
+    .catch(err => next(new GeneralError('Internal Error')));    
+  });
+  */
 }
 
 /**
@@ -376,9 +394,7 @@ function getMusicContent(req, res, next) {
  */
 async function getListOfMusic(req, res) {
   listMusic = []
-  if (req.body.ids.length == 0) {
-    return res.status(404).send('no id provided')
-  }
+  if(!req.body.ids || req.body.ids.length == 0) { return res.status(404).send("no id provided") }
   // Promise.all(req.body.ids.map( id => {
   //   musicService.fullMusic(id)
   //   .then(music => {

@@ -5,6 +5,9 @@ import FavoriteIcon from '@material-ui/icons/Favorite'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import ForkIcon from './../assets/svg/fork'
 import defaultPicture from './../assets/picture/defaultMusic.jpg'
+import StopIcon from '@material-ui/icons/Stop';
+import { selectID } from '../app/userSlice'
+import { useHistory } from 'react-router-dom'
 
 /**
  * @function MusicCard
@@ -16,8 +19,11 @@ export default function MusicCard(props) {
   /**
    * State
    */
-  const { musicID } = props
+  const history = useHistory()
+  const userID = useSelector(selectID)
+  const { musicID,  handleMusicPlay, handleMusicStop} = props
   const [hover, setHover] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
   const musicObject = useSelector((state) => state.MusicPack.musics[musicID])
   const musicPicture = musicObject.image ? musicObject.image : defaultPicture
   const username = musicObject.login
@@ -97,6 +103,20 @@ export default function MusicCard(props) {
     right: 20,
   }
 
+  const stopButtonStyle = {
+    width: 30,
+    height: 30,
+    backgroundColor: '#CE4848',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  }
+
   const buttonsContainer = {
     display: 'flex',
     flexDirection: 'row',
@@ -117,22 +137,54 @@ export default function MusicCard(props) {
    */
   const onMouseEnter = () => setHover(true)
   const onMouseLeave = () => setHover(false)
-  const onPlayButtonClick = () => {}
+
+  const onPlayButtonClick = (e, musicObject) => {
+    e.stopPropagation();
+    setIsPlaying(true)
+    handleMusicPlay(musicObject)
+  }
+
+  const onStopButtonClick = (e) => {
+    e.stopPropagation();
+    setIsPlaying(false)
+    handleMusicStop()
+  }
+
+  const handleCardClick = () => {
+    let mode = userID === musicObject.fk_author ? 'edit' : 'view'
+    let parameters = {
+      mode: mode,
+      musicObject: musicObject
+    } 
+    history.push({
+      pathname: '/editor',
+      state: parameters
+    })
+  }
+
+  const ButtonRender = isPlaying ? (
+    <ButtonBase style={stopButtonStyle} onClick={(e)=>onStopButtonClick(e)}>
+      <StopIcon style={{ color: '#fff' }} />
+    </ButtonBase>
+  )
+  :
+  (
+    <ButtonBase style={playButtonStyle} onClick={(e)=>{onPlayButtonClick(e,musicObject)}}>
+      <PlayArrowIcon style={{ color: '#fff' }} />
+    </ButtonBase>
+  )
 
   return (
     <div
       style={container}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onClick={handleCardClick}
     >
       <div style={containerWrapper}>
         <div style={{ width: '100%', position: 'relative' }}>
           <img src={musicPicture} style={imageStyle} />
-          {hover && (
-            <ButtonBase style={playButtonStyle} onClick={onPlayButtonClick}>
-              <PlayArrowIcon style={{ color: '#fff' }} />
-            </ButtonBase>
-          )}
+          {hover && ButtonRender}
         </div>
         <h1 style={titleStyle}>{musicObject.title}</h1>
         <p style={authorStyle}>{`By ${username}`}</p>

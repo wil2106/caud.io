@@ -18,8 +18,10 @@ const Music = sequelize.define('music', {
     nb_likes: Sequelize.INTEGER,
     nb_forks: Sequelize.INTEGER,
     nb_listen: Sequelize.INTEGER,
-    setup_code: Sequelize.STRING,
-    step_code: Sequelize.STRING,
+    setup_code: Sequelize.TEXT('long'),
+    step_code: Sequelize.TEXT('long'),
+    bpm: Sequelize.INTEGER,
+    nb_steps: Sequelize.INTEGER,
     can_fork: Sequelize.BOOLEAN,
     private: Sequelize.BOOLEAN,
     image: Sequelize.BLOB

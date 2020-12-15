@@ -8,7 +8,7 @@ let sequelize = new Sequelize(
   {
     host: config.dbHost,
     dialect: 'postgres',
-  }
-)
+    logging: false
+});
 
 module.exports = sequelize
