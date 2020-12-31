@@ -17,6 +17,13 @@ const getAll = () => Libraries.findAll()
 const add = (library) => Libraries.create(library)
 
 /**
+ * @function addMultiple
+ * @description Add several library objects to the library
+ * @param {List<Object>} libraries
+ */
+const addMultiple = (libraries) => Libraries.bulkCreate(libraries)
+
+/**
  * @function getSamplesForMusic
  * @description retrieve associated sample from music object
  * @param {string} musicId_
@@ -36,13 +43,11 @@ const getSamplesForMusic = (musicId_) =>
  */
 const getUniqueSampleForMusic = (musicId_) =>
   sequelize.query(
-    'select "sampleId" from libraries where "musicId" = ' +
-      musicId_ +
-      ' \
+    // eslint-disable-next-line no-multi-str
+    'SELECT "sampleId" FROM libraries WHERE "musicId" = $id \
     EXCEPT \
-    select "sampleId" from libraries where "musicId" != ' +
-      musicId_ +
-      ' ;'
+    SELECT "sampleId" FROM libraries WHERE "musicId" != $id',
+    { bind: { id: musicId_ }, type: sequelize.QueryTypes.SELECT }
   )
 
 /**
@@ -64,4 +69,5 @@ module.exports = {
   getSamplesForMusic,
   getUniqueSampleForMusic,
   deleteLibraryForMusic,
+  addMultiple
 }

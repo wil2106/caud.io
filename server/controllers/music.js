@@ -1,7 +1,7 @@
 const musicService = require('../services/music')
 const libraryService = require('../services/library')
 const sampleService = require('../services/sample')
-const { GeneralError, NotFound } = require('../middlewares/errorClass')
+const { GeneralError, NotFound, BadRequest } = require('../middlewares/errorClass')
 
 const {
   getPagination,
@@ -46,30 +46,24 @@ async function createMusic(req, res, next) {
     nb_steps
   }
 
-  
-  musicService.add(music)
-  .then(musicData => {
-    samples.forEach((sample) => {
-      sampleService.add(sample)
-      .then((sampleData) => {
-        libraryService.add({ musicId: musicData.id, sampleId: sampleData.id })
-        .catch(err => {
-          console.log(err)
-          next(new GeneralError('Internal Error'))
-          });
-      })
-      .catch(err =>{
-        console.log(err)
-        next(new GeneralError('Internal Error'))
-      } );
-    })
-  })
-  .then(data => res.send(data))
-  .catch(err => {
-    console.log(err)
+  let libraryData = []
+  try {
+    const data = await Promise.all([
+      musicService.add(music),
+      sampleService.addMultiple(samples),
+    ])
+
+    const musicData = data[0]
+    const samplesData = data[1]
+
+    samplesData.forEach(sample => {
+      libraryData.push({musicId: musicData.id, sampleId: sample.dataValues.id })        
+    });
+    await libraryService.addMultiple(libraryData)
+    .then( _ => {res.send("music added successfully")})
+  } catch(err) {
     next(new GeneralError('Internal Error'))
-  });
-  
+  }
 }
 
 /**
@@ -79,28 +73,17 @@ async function createMusic(req, res, next) {
  * @param { import('express').Response } res
  * @param { function } next
  */
-function deleteMusic(req, res, next) {
-  libraryService
-    .getUniqueSampleForMusic(parseInt(req.params.id))
-    .then((result) => {
-      result[0].forEach((sample) => {
-        sampleService
-          .deleteSample(sample.sampleId)
-          .catch((err) => next(new GeneralError('Internal Error')))
-      })
-    })
-    .then(
-      musicService
-        .deleteMusic(req.params.id)
-        .catch((err) => next(new GeneralError('Internal Error')))
-    )
-    .then(
-      libraryService
-        .deleteLibraryForMusic(req.params.id)
-        .catch((err) => next(new GeneralError('Internal Error')))
-    )
-    .then((data) => res.send(data))
-    .catch((err) => next(new GeneralError('Internal Error')))
+async function deleteMusic(req, res, next) {
+  let listSampleId = []
+  const result = await libraryService.getUniqueSampleForMusic(req.params.id)
+  result.forEach((sample) => {
+    listSampleId.push(sample.sampleId)
+  })
+  Promise.all([
+    sampleService.deleteSamples(listSampleId),
+    musicService.deleteMusic(req.params.id), // automatically delete from libraries because tables are linked   
+  ])
+  .catch((err) => next(new GeneralError('Internal Error')))
 }
 
 /**
@@ -328,20 +311,14 @@ function getFullMusic(req, res, next) {
         return next(new NotFound('the music is either non-existent or private'))
 
       fullMusic.music = data[0]
-      Promise.all(
-        data[1]
-          .map((x) => x.dataValues.sampleId)
-          .map((s) => {
-            return sampleService.getById(s)
-          })
-      )
-        .then((samplesData) => {
-          samplesData.forEach((sampleData) => {
-            fullMusic.samples.push(sampleData)
-          })
-          res.send(fullMusic)
+      sampleService.getByIds(data[1].map((x) => x.dataValues.sampleId))
+      .then((samplesData) => {
+        samplesData.forEach((sampleData) => {
+          fullMusic.samples.push(sampleData)
         })
-        .catch((err) => next(new GeneralError('Internal Error')))
+        res.send(fullMusic)
+      })
+      .catch((err) => next(new GeneralError('Internal Error')))
     })
     .catch((err) => next(new GeneralError('Internal Error')))
 }
@@ -393,7 +370,7 @@ function getMusicContent(req, res, next) {
  * @param { function } next
  * @async
  */
-async function getListOfMusic(req, res) {
+async function getListOfMusic(req, res, next) {
   listMusic = []
   if(!req.body.ids || req.body.ids.length == 0) { return res.status(404).send("no id provided") }
   // Promise.all(req.body.ids.map( id => {
@@ -418,15 +395,8 @@ async function getListOfMusic(req, res) {
   //   .catch(error => res.send(error));
   // }))
   // .catch(error => res.send(error));
-
   try {
-    const data = await Promise.all(
-      req.body.ids.map(async (id) => {
-        const musicData = await musicService.fullMusic(id)
-        if (!musicData || !musicData.length) return
-        return musicData[0]
-      })
-    )
+    const data = await musicService.fullMusics(req.body.ids)
     if (!data || !data.length) next(new NotFound('Empty result'))
     return res.status(200).send({
       data: data,

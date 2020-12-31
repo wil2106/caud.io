@@ -1,4 +1,5 @@
 const libraryService = require('../services/library')
+const { GeneralError, NotFound } = require('../middlewares/errorClass')
 
 /**
  * @function getLibraries
