@@ -21,12 +21,12 @@ async function createMusic(req, res, next) {
     setup_code,
     step_code,
     can_fork,
-    private,
+    private: isPrivate,
     image,
     fk_author,
     samples,
     bpm,
-    nb_steps
+    nb_steps,
   } = req.body
 
   let imageBuffer = Buffer.from(image,"base64");
@@ -39,11 +39,11 @@ async function createMusic(req, res, next) {
     setup_code,
     step_code,
     can_fork,
-    private,
+    private: isPrivate,
     image: imageBuffer,
     fk_author,
     bpm,
-    nb_steps
+    nb_steps,
   }
 
   let libraryData = []
