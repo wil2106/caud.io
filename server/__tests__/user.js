@@ -1,9 +1,5 @@
-const app = require('./../App')
-const supertest = require('supertest')
-const request = supertest(app)
-const { Client } = require('pg')
-
 // Constants
+const { Client, Request: request } = require('./../test.config')
 const userData = {
   id: 1,
   login: 'email@email.fr',
@@ -12,20 +8,11 @@ const userData = {
 
 let token
 let id
-let client
 
 beforeAll(async () => {
-  client = new Client({
-    user: process.env.DB_USERNAME,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: 5432,
-  })
+  Client.connect()
 
-  client.connect()
-
-  client.query('SELECT NOW()', (err, res) => {
+  Client.query('SELECT NOW()', (err, res) => {
     console.log(err, res)
     client.end()
   })
