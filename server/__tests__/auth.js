@@ -1,17 +1,18 @@
-const app = require('./../App')
-const supertest = require('supertest')
-const request = supertest(app)
+const { Client, Request: request } = require('./../test.config')
 
-it('Gets the test endpoint', async (done) => {
-  const res = await request.get('/api/test')
+beforeAll(() => {
+  Client.connect()
 
-  if (res.text === 'hello world') done()
+  Client.query(
+    `INSERT INTO public.users (login, password, description, "createdAt", "updatedAt") 
+    VALUES ('testEmail@email.io', '$2b$04$M7vb/5cyQBDibj5eD/9nP.t3E4culxDwaoYZN2s4XR64SbrtADeIq', null, '2020-12-08 17:03:08.350000', '2020-12-08 17:03:08.350000');`
+  )
 })
 
 // Success case
 it('Auth with good credentials', async (done) => {
   const res = await request.post('/api/login').send({
-    login: 'email@email.fr',
+    login: 'testEmail@email.io',
     password: 'secret',
   })
   if (res.body.data.token) done()
@@ -19,11 +20,13 @@ it('Auth with good credentials', async (done) => {
 
 it('Register success', async (done) => {
   const res = await request.post('/api/register').send({
-    login: 'positiveTest@email.fr',
+    login: 'registerTest@email.io',
     password: 'Secret123',
   })
-
-  if (res.body.success) done()
+  const dbQuery = await Client.query(
+    `SELECT * FROM Users WHERE login='registerTest@email.io'`
+  )
+  if (dbQuery.rows[0] && res.body.success) return done()
 })
 
 // Negative case
