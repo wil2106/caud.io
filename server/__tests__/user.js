@@ -120,20 +120,35 @@ it('GET /api/user/:id/musicIDs', async (done) => {
   ) {
     done()
   }
-
-  
 })
 
-// it('DELETE /user/delete/:id', async (done) => {})
+it('DELETE /user/delete', async (done) => {
+  await request
+    .del(`/api/user/delete`)
+    .set('Authorization', `bearer ${token}`)
+    .expect(204)
 
-// it('PUT /user/update/:id', async (done) => {})
+  const dbQuery = await Client.query(`SELECT * FROM Users WHERE id=${id}`)
 
+  if (!dbQuery.rows || !dbQuery.rows.length) done()
+})
+
+// it('PUT /user/update/:id', async (done) => {
+//   await Client.query(
+//     `INSERT INTO public.users (id, login, password, description, "createdAt", "updatedAt") VALUES (102, 'email@email.fr', '$2b$04$M7vb/5cyQBDibj5eD/9nP.t3E4culxDwaoYZN2s4XR64SbrtADeIq', 'email', '2020-12-08 11:03:37.849000', '2020-12-08 11:03:37.849000');`
+//   )
+
+//   await request
+//     .del(`/api/user/102`)
+// })
+
+
+// Security test
+// TODO: deleting another user than current one
 // Clean up
-
 afterAll(() => {
   Promise.all([
-    Client.query(`DELETE FROM Users WHERE id=${id}`),
-    Client.query(`DELETE FROM Music WHERE id=100`)
+    // Client.query(`DELETE FROM Users WHERE id=${id}`),
+    Client.query(`DELETE FROM Music WHERE id=100`),
   ]).then(() => Client.end())
-  
 })

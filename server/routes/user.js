@@ -10,7 +10,7 @@ router.get(
   userController.getUserMusicIDs
 )
 router.delete(
-  '/user/delete/:id',
+  '/user/delete',
   authMiddleware.checkAuth,
   userController.deleteUser
 )

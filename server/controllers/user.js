@@ -3,6 +3,7 @@ const {
   getPagination,
   getPaginationData,
 } = require('./../middlewares/pagination')
+const { GeneralError } = require('./../middlewares/errorClass.js')
 
 /**
  * @function getUser
@@ -51,14 +52,14 @@ function getUserMusicIDs(req, res) {
  * @param { import('express').Response } res
  * @param { function } next
  */
-function deleteUser(req, res) {
-  userService
-    .getUserByLogin(req.body.login)
-    .then((result) => {
-      userService.deleteUser(result.id)
-    })
-    .then((data) => res.send(data))
-    .catch((err) => next(new GeneralError('Internal Error')))
+async function deleteUser(req, res, next) {
+  const { id } = req.user
+  try {
+    const data = await userService.deleteUser(parseInt(id))
+    return res.sendStatus(204).send(data)
+  } catch (err) {
+    next(new GeneralError('Internal Error'))
+  }
 }
 
 /**
