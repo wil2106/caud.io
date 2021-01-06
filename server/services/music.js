@@ -106,6 +106,16 @@ const fullMusic = (id_) =>
     { bind: { id: id_ }, type: sequelize.QueryTypes.SELECT }
   )
 
+  const fullMusics = (ids_) =>
+  sequelize.query(
+    `SELECT music.id, music.title, music.nb_forks,
+    music.nb_likes, music.nb_listen, music.can_fork,
+    users.login, encode(image, 'base64') as image
+    FROM music, users
+    WHERE music.fk_author=users.id AND music.id = ANY($ids)`,
+    { bind: { ids: ids_ }, type: sequelize.QueryTypes.SELECT }
+  )
+
 const musicContent = (id_) =>
   Music.findAll({
     attributes: ['setup_code', 'step_code'],
@@ -129,5 +139,6 @@ module.exports = {
   mostListen,
   searchTitle,
   fullMusic,
+  fullMusics,
   musicContent,
 }
