@@ -1,6 +1,10 @@
 cache:
   paths:
-    -node_modules/
+    - node_modules/
+
+stages:
+  - init
+  - deploy_prod
 
 init:
   stage: init
