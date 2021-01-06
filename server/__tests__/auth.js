@@ -4,8 +4,11 @@ beforeAll(() => {
   Client.connect()
 
   Client.query(
-    `INSERT INTO public.users (login, password, description, "createdAt", "updatedAt") 
-    VALUES ('testEmail@email.io', '$2b$04$M7vb/5cyQBDibj5eD/9nP.t3E4culxDwaoYZN2s4XR64SbrtADeIq', null, '2020-12-08 17:03:08.350000', '2020-12-08 17:03:08.350000');`
+    `INSERT INTO public.users (id, login, password, description, "createdAt", "updatedAt") 
+    VALUES (100, 'testEmail@email.io', '$2b$04$M7vb/5cyQBDibj5eD/9nP.t3E4culxDwaoYZN2s4XR64SbrtADeIq', null, '2020-12-08 17:03:08.350000', '2020-12-08 17:03:08.350000');`,
+    (err, res) => {
+      console.log(err)
+    }
   )
 })
 
@@ -116,4 +119,13 @@ it('Register with incorrect password without lower', async (done) => {
   })
 
   if (!res.body.success) done()
+})
+
+// Clean up
+
+afterAll(() => {
+  Promise.all([
+    Client.query(`DELETE FROM Users WHERE id=100`),
+    Client.query(`DELETE FROM Users WHERE login='registerTest@email.io'`),
+  ]).then(() => Client.end())
 })
