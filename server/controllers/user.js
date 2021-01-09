@@ -4,10 +4,6 @@ const {
   getPaginationData,
 } = require('./../middlewares/pagination')
 const { GeneralError } = require('./../middlewares/errorClass.js')
-const bcrypt = require('bcrypt')
-const config = require('./../config')
-
-const SAFEPASSWORDREGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/g
 
 /**
  * @function getUser
