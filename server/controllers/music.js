@@ -1,7 +1,7 @@
 const musicService = require('../services/music')
 const libraryService = require('../services/library')
 const sampleService = require('../services/sample')
-const { GeneralError, NotFound, BadRequest } = require('../middlewares/errorClass')
+const { GeneralError, NotFound } = require('../middlewares/errorClass')
 
 const {
   getPagination,
@@ -141,7 +141,7 @@ function like(req, res, next) {
   musicService
     .like(req.body.id)
     .then((data) => {
-      if (data == 0) return next(new NotFound('No music with this id'))
+      if (data === 0) return next(new NotFound('No music with this id'))
     })
     .catch((err) => next(new GeneralError('Internal Error')))
   musicService
@@ -167,7 +167,7 @@ function fork(req, res, next) {
   musicService
     .fork(req.body.id)
     .then((data) => {
-      if (data == 0) return next(new NotFound('No music with this id'))
+      if (data === 0) return next(new NotFound('No music with this id'))
     })
     .catch((err) => next(new GeneralError('Internal Error')))
   musicService
@@ -187,7 +187,7 @@ function listen(req, res, next) {
   musicService
     .listen(req.body.id)
     .then((data) => {
-      if (data == 0) {
+      if (data === 0) {
         return res.status(404).send({ error: 'No music with this id' })
       }
       res.status(204).send()
@@ -307,7 +307,7 @@ function getFullMusic(req, res, next) {
     libraryService.getSamplesForMusic(req.params.id),
   ])
     .then((data) => {
-      if (data[0].length == 0)
+      if (data[0].length === 0)
         return next(new NotFound('the music is either non-existent or private'))
 
       fullMusic.music = data[0]
@@ -340,7 +340,7 @@ function getMusicContent(req, res, next) {
     libraryService.getSamplesForMusic(req.params.id),
   ])
     .then((data) => {
-      if (data[0].length == 0)
+      if (data[0].length === 0)
         return next(new NotFound('the music is either non-existent or private'))
 
       musicContent.music = data[0]
@@ -371,30 +371,7 @@ function getMusicContent(req, res, next) {
  * @async
  */
 async function getListOfMusic(req, res, next) {
-  listMusic = []
-  if(!req.body.ids || req.body.ids.length == 0) { return res.status(404).send("no id provided") }
-  // Promise.all(req.body.ids.map( id => {
-  //   musicService.fullMusic(id)
-  //   .then(music => {
-  //     if(music.length == 0) {
-  //       return res.status(404).send("one of the musics is either non-existent or private")
-  //     }
-  //     if(music[0].dataValues.fk_author == null) {
-  //       return res.status(404).send("author of one of the music is not specified")
-  //     }
-  //     userService.getUserLoginById(music[0].dataValues.fk_author)
-  //     .then(login => {
-  //       music[0].dataValues.authorLogin = login.login
-  //       listMusic.push(music[0])
-  //       if( listMusic.length == req.body.ids.length ) {
-  //         return res.send(listMusic)
-  //       }
-  //     })
-  //     .catch(error => res.send(error));
-  //   })
-  //   .catch(error => res.send(error));
-  // }))
-  // .catch(error => res.send(error));
+  if(!req.body.ids || req.body.ids.length === 0) { return res.status(404).send("no id provided") }
   try {
     const data = await musicService.fullMusics(req.body.ids)
     if (!data || !data.length) next(new NotFound('Empty result'))

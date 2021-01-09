@@ -10,14 +10,10 @@ router.get(
   userController.getUserMusicIDs
 )
 router.delete(
-  '/user/delete/:id',
+  '/user/delete',
   authMiddleware.checkAuth,
   userController.deleteUser
 )
-router.put(
-  '/user/update/:id',
-  authMiddleware.checkAuth,
-  userController.updateUser
-)
+router.put('/user/update', authMiddleware.checkAuth, userController.updateUser)
 
 module.exports = router

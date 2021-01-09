@@ -3,6 +3,11 @@ const {
   getPagination,
   getPaginationData,
 } = require('./../middlewares/pagination')
+const { GeneralError } = require('./../middlewares/errorClass.js')
+const bcrypt = require('bcrypt')
+const config = require('./../config')
+
+const SAFEPASSWORDREGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/g
 
 /**
  * @function getUser
@@ -51,14 +56,14 @@ function getUserMusicIDs(req, res) {
  * @param { import('express').Response } res
  * @param { function } next
  */
-function deleteUser(req, res) {
-  userService
-    .getUserByLogin(req.body.login)
-    .then((result) => {
-      userService.deleteUser(result.id)
-    })
-    .then((data) => res.send(data))
-    .catch((err) => next(new GeneralError('Internal Error')))
+async function deleteUser(req, res, next) {
+  const { id } = req.user
+  try {
+    const data = await userService.deleteUser(parseInt(id))
+    return res.sendStatus(204).send(data)
+  } catch (err) {
+    next(new GeneralError('Internal Error'))
+  }
 }
 
 /**
@@ -69,13 +74,24 @@ function deleteUser(req, res) {
  * @param { function } next
  */
 function updateUser(req, res, next) {
-  let user = {
-    login: req.body.login,
-    password: req.body.password,
-    description: req.body.description,
+  const { id } = req.user
+  const { login, password, description } = req.body
+
+  let encryptedPassword = null
+  if (password && password.match(SAFEPASSWORDREGEX)) {
+    encryptedPassword = bcrypt.hashSync(password, config.saltRounds)
+    console.log(encryptedPassword)
   }
+
   userService
-    .updateUser(user, req.params.id)
+    .updateUser(
+      {
+        login,
+        password: encryptedPassword,
+        description,
+      },
+      id
+    )
     .then((data) => res.send(data))
     .catch((err) => next(new GeneralError('Internal Error')))
 }
