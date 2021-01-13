@@ -46,7 +46,6 @@
     ]
   },
   "devDependencies": {
-    "babel-plugin-transform-remove-console": "^6.9.4",
-    "pg": "^8.5.1"
+    "babel-plugin-transform-remove-console": "^6.9.4"
   }
 }

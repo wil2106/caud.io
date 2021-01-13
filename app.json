@@ -1,7 +1,9 @@
 {
     "environments": {
       "test": {
-        "addons": ["heroku-postgresql:in-dyno"]
+        "scripts": {
+          "test-setup": "cd server"
+        }
       }
     }
-  }
+}
