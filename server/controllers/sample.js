@@ -1,4 +1,5 @@
 const sampleService = require('../services/sample')
+const { GeneralError } = require('../middlewares/errorClass')
 
 /**
  * @function getSamples

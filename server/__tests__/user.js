@@ -1,10 +1,6 @@
 // Constants
 const { Client, Request: request } = require('./../test.config')
-const userData = {
-  id: 1,
-  login: 'email@email.fr',
-  description: 'email',
-}
+const bcrypt = require('bcrypt')
 
 let token
 let id
@@ -148,6 +144,7 @@ it('DELETE /user/delete', async (done) => {
 // Clean up
 afterAll(() => {
   Promise.all([
+
     // Client.query(`DELETE FROM Users WHERE id=${id}`),
     Client.query(`DELETE FROM Music WHERE id=100`),
   ]).then(() => Client.end())

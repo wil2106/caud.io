@@ -1,5 +1,5 @@
 const { Music, Notification } = require('../models')
-const { Op, Sequelize } = require('sequelize')
+const { Op } = require('sequelize')
 const sequelize = require('../db')
 
 const baseQuery = (orderBy) =>

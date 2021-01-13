@@ -70,13 +70,24 @@ async function deleteUser(req, res, next) {
  * @param { function } next
  */
 function updateUser(req, res, next) {
-  let user = {
-    login: req.body.login,
-    password: req.body.password,
-    description: req.body.description,
+  const { id } = req.user
+  const { login, password, description } = req.body
+
+  let encryptedPassword = null
+  if (password && password.match(SAFEPASSWORDREGEX)) {
+    encryptedPassword = bcrypt.hashSync(password, config.saltRounds)
+    console.log(encryptedPassword)
   }
+
   userService
-    .updateUser(user, req.params.id)
+    .updateUser(
+      {
+        login,
+        password: encryptedPassword,
+        description,
+      },
+      id
+    )
     .then((data) => res.send(data))
     .catch((err) => next(new GeneralError('Internal Error')))
 }
