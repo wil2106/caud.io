@@ -84,7 +84,7 @@ it('Register with registered login', async (done) => {
   if (!res.body.success) done()
 })
 
-// Test password validation
+// Test the password validation
 it('Register with incorrect password without digits', async (done) => {
   const res = await request.post('/api/register').send({
     login: 'testPassword@test.fr',
