@@ -14,12 +14,14 @@ const client = new Client({
   port: 5432,
 })
 
+/*
 client.connect()
 client.query(sql, (err, res) => {
   if (err) throw err
   console.log(res)
   client.end()
 })
+*/
 
 module.exports = {
   Client: client,
