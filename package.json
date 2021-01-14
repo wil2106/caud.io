@@ -37,6 +37,7 @@
     "serv": "cd server && node index.js",
     "build": "react-scripts build",
     "test": "cd server && jest --watch -i",
+    "ci-test": "cd server && jest --watch --ci --bail",
     "start": "cd server && node index.js"
   },
   "eslintConfig": {
