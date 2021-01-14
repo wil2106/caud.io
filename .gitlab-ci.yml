@@ -10,7 +10,7 @@ variables:
   POSTGRES_HOST_AUTH_METHOD: trust
   DB_NAME: caudio
   DB_USERNAME: runner
-  DB_PASSWORD: 
+  DB_PASSWORD: ""
   DB_HOST: localhost
   JWT_SECRET: yo-its-a-secret
 
