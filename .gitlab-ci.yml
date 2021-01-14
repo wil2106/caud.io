@@ -4,6 +4,7 @@ cache:
 
 stages:
   - init
+  - test
   - deploy_prod
 
 init:
@@ -11,6 +12,12 @@ init:
   image: node:12.18.3
   script:
     - npm install
+
+test:
+  stage: test
+  image: node:12.18.3
+  script:
+    - npm test
 
 deploy_prod:
   stage: deploy_prod
