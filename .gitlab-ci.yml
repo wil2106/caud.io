@@ -1,3 +1,8 @@
+image: node:latest
+
+services:
+  - postgres:latest
+
 cache:
   paths:
     - node_modules/
@@ -9,19 +14,16 @@ stages:
 
 init:
   stage: init
-  image: node:12.18.3
   script:
     - npm install
 
 test:
   stage: test
-  image: node:12.18.3
   script:
     - npm test
 
 deploy_prod:
   stage: deploy_prod
-  image: node:12.18.3
   script:
     - git push https://$HEROKU_USER:$HEROKU_API_KEY@git.heroku.com/caudio.git HEAD:master
     - echo "Deployed to prod server"

@@ -36,7 +36,7 @@
     "front": "react-scripts start",
     "serv": "cd server && node index.js",
     "build": "react-scripts build",
-    "test": "cd server && jest --forceExit --watchAll",
+    "test": "cd server && jest --watch -i",
     "start": "cd server && node index.js"
   },
   "eslintConfig": {
