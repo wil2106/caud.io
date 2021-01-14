@@ -7,7 +7,14 @@ let id
 
 // Test setup
 beforeAll(async () => {
-  Client.connect()
+  Client.connect(err => {
+    if (err) {
+      console.error('connection error', err.stack)
+    } else {
+      console.log('connected')
+    }
+  }
+  )
 
   Promise.all([
     Client.query(

@@ -1,5 +1,14 @@
 image: node:latest
 
+services:
+  - postgres:latest
+
+variables:
+  POSTGRES_DB: caudio
+  POSTGRES_USER: runner
+  POSTGRES_PASSWORD: hello
+  POSTGRES_HOST_AUTH_METHOD: trust
+
 cache:
   paths:
     - node_modules/

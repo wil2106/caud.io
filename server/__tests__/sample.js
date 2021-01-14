@@ -3,7 +3,14 @@ const { Client, Request: request } = require('./../test.config')
   let token
 
 beforeAll(async () => {
-  await Client.connect()
+  await Client.connect(err => {
+    if (err) {
+      console.error('connection error', err.stack)
+    } else {
+      console.log('connected')
+    }
+  }
+)
 
   await Client.query(
     `INSERT INTO public.users (id, login, password, description, "createdAt", "updatedAt") 

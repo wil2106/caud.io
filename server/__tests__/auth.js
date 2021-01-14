@@ -1,7 +1,14 @@
 const { Client, Request: request } = require('./../test.config')
 
 beforeAll(() => {
-  Client.connect()
+  Client.connect(err => {
+      if (err) {
+        console.error('connection error', err.stack)
+      } else {
+        console.log('connected')
+      }
+    }
+  )
 
   Client.query(
     `INSERT INTO public.users (id, login, password, description, "createdAt", "updatedAt") 
