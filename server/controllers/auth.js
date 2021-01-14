@@ -1,5 +1,4 @@
 const config = require('../config')
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
 const authService = require('../services/auth')
