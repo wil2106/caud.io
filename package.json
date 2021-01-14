@@ -36,7 +36,8 @@
     "front": "react-scripts start",
     "serv": "cd server && node index.js",
     "build": "react-scripts build",
-    "test": ""
+    "test": "",
+    "start": "cd server && node index.js"
   },
   "eslintConfig": {
     "extends": "react-app"
