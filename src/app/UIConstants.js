@@ -6,7 +6,7 @@ import { MenuBook, Explore, Info } from '@material-ui/icons'
 export const pages = [
   {
     icon: Explore,
-    title: 'Explore',
+    title: 'Explori',
   },
   {
     icon: MenuBook,
